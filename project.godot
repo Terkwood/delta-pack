@@ -16,3 +16,7 @@ _global_script_class_icons={
 [application]
 
 run/main_scene="res://Main.tscn"
+
+[autoload]
+
+Version="*res://version.gd"
