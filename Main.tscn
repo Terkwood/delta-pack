@@ -11,26 +11,30 @@ anchor_right = 1.0
 margin_right = 255.0
 margin_bottom = 151.0
 rect_scale = Vector2( 4, 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
-margin_left = 95.0
+margin_left = 80.0
 margin_top = 34.0
-margin_right = 159.0
+margin_right = 174.0
 margin_bottom = 116.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Version Label" type="Label" parent="Panel/VBoxContainer"]
-margin_right = 64.0
+margin_right = 94.0
 margin_bottom = 14.0
+text = "Running v0.0.0"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="TextureRect" type="TextureRect" parent="Panel/VBoxContainer"]
 margin_top = 18.0
-margin_right = 64.0
+margin_right = 94.0
 margin_bottom = 82.0
 texture = ExtResource( 1 )
 __meta__ = {
@@ -38,5 +42,7 @@ __meta__ = {
 }
 
 [node name="Timer" type="Timer" parent="."]
+wait_time = 1.945
+one_shot = true
 autostart = true
 [connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
