@@ -1,12 +1,13 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://icon.png" type="Texture" id=1]
 [ext_resource path="res://Main.gd" type="Script" id=2]
+[ext_resource path="res://Patch Status.gdns" type="Script" id=3]
 
 [node name="Main" type="Node2D"]
 script = ExtResource( 2 )
 
-[node name="Panel" type="CenterContainer" parent="."]
+[node name="CenterContainer" type="CenterContainer" parent="."]
 anchor_right = 1.0
 margin_right = 255.0
 margin_bottom = 151.0
@@ -15,16 +16,16 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
 margin_left = 80.0
-margin_top = 34.0
+margin_top = 25.0
 margin_right = 174.0
-margin_bottom = 116.0
+margin_bottom = 125.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Version Label" type="Label" parent="Panel/VBoxContainer"]
+[node name="Version Label" type="Label" parent="CenterContainer/VBoxContainer"]
 margin_right = 94.0
 margin_bottom = 14.0
 text = "Running v0.0.0"
@@ -32,7 +33,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="TextureRect" type="TextureRect" parent="Panel/VBoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer"]
 margin_top = 18.0
 margin_right = 94.0
 margin_bottom = 82.0
@@ -40,6 +41,12 @@ texture = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="Patch Status" type="Label" parent="CenterContainer/VBoxContainer"]
+margin_top = 86.0
+margin_right = 94.0
+margin_bottom = 100.0
+script = ExtResource( 3 )
 
 [node name="Timer" type="Timer" parent="."]
 wait_time = 1.945

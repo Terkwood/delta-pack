@@ -1,0 +1,11 @@
+[package]
+name = "incremental_patch"
+version = "0.1.0"
+authors = ["Terkwood <38859656+Terkwood@users.noreply.github.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+gdnative = "0.9.1"
