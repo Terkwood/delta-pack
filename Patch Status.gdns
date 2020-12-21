@@ -6,5 +6,5 @@ dependency/OSX.64 = [  ]
 
 [resource]
 resource_name = "IncrPatch"
-class_name = "IncrPatch"
+class_name = "IncrementalPatch"
 library = SubResource( 1 )
