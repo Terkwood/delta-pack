@@ -4,6 +4,6 @@
 
 So far we are only demonstrating the live loading of a PCK file.  A more complete example of incremental patching will hopefully be delivered soon.  
 
-You can read the planning ticket in #2.
+[Read the planning ticket](https://github.com/Terkwood/godot-incremental-patch/issues/2).
 
 [See the official docs](https://godot-es-docs.readthedocs.io/en/latest/getting_started/workflow/export/exporting_pcks.html) for more information on Godot Engine's support for live-reloading of PCK (game payload) files.
