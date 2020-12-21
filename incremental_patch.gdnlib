@@ -7,12 +7,12 @@ reloadable=true
 
 [entry]
 
-OSX.64="res://../../target/debug/libincremental_patch.dylib"
-X11.64="res://../../target/debug/libincremental_patch.so"
+OSX.64="res://target/debug/libincremental_patch.dylib"
 Windows.64="res://../../target/debug/incremental_patch.dll"
+X11.64="res://../../target/debug/libincremental_patch.so"
 
 [dependencies]
 
 OSX.64=[  ]
-UWP.64=[  ]
+Windows.64=[  ]
 X11.64=[  ]
