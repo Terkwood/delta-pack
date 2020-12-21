@@ -15,7 +15,7 @@ impl IncrementalPatch {
 
     #[export]
     fn _ready(&mut self, _owner: &Label) {
-        godot_print!("Hello from rust")
+        godot_print!("Hello from rust with bogus value: {}", self.bogus)
     }
 }
 
