@@ -17,9 +17,9 @@ __meta__ = {
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
 margin_left = 80.0
-margin_top = 34.0
+margin_top = 25.0
 margin_right = 174.0
-margin_bottom = 116.0
+margin_bottom = 125.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -40,6 +40,11 @@ texture = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="Patch Status" type="Label" parent="Panel/VBoxContainer"]
+margin_top = 86.0
+margin_right = 94.0
+margin_bottom = 100.0
 
 [node name="Timer" type="Timer" parent="."]
 wait_time = 1.945
