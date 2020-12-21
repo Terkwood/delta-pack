@@ -1,0 +1,10 @@
+[gd_resource type="NativeScript" load_steps=2 format=2]
+
+[sub_resource type="GDNativeLibrary" id=1]
+entry/OSX.64 = "res://target/debug/libincremental_patch.dylib"
+dependency/OSX.64 = [  ]
+
+[resource]
+resource_name = "IncrPatch"
+class_name = "IncrPatch"
+library = SubResource( 1 )
