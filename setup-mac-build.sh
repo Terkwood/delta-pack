@@ -1,6 +1,9 @@
 #!/bin/bash
 
-brew install FiloSottile/musl-cross/musl-cross
+# set up some cross compiling stuff on mac
+# https://stackoverflow.com/questions/41761485/how-to-cross-compile-from-mac-to-linux
+brew tap SergioBenitez/osxct
+brew install x86_64-unknown-linux-gnu
 
 # see https://stackoverflow.com/questions/52295433/c-header-file-wchar-h-not-found-using-g-macos
 # see https://github.com/imageworks/OpenShadingLanguage/issues/1055
