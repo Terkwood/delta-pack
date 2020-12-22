@@ -1,4 +1,6 @@
-# delta pack: automated, incremental updates for Godot (WIP)
+# 🚧 delta pack: incremental updates for Godot games 🚧
+
+🏗 _THIS PROJECT IS STILL UNDER CONSTRUCTION!_ 🏗
 
 ![Live loading a PCK file](https://user-images.githubusercontent.com/38859656/102728162-25e4b400-42f8-11eb-9265-a3a93e32aab1.gif)
 
@@ -8,18 +10,6 @@ So far we are only demonstrating the live loading of a PCK file. A more complete
 
 [See the official docs](https://godot-es-docs.readthedocs.io/en/latest/getting_started/workflow/export/exporting_pcks.html) for more information on Godot Engine's support for live-reloading of PCK (game payload) files.
 
-## Setting up Cross-Compilation with Mac as Host
-
-You need to run [this script](setup-mac-build.sh) if you want to cross-compile
-from Mac to Linux. The SergioBenitez brew config is important.
-
-## Exported Payload
-
-For example, if you export as a Linux/X11 app, your deliverables will look like this:
-
-```text
-libincremental_patch.so linux-test.pck          linux-test.x86_64
-```
 
 ## Using bidiff
 
@@ -49,3 +39,21 @@ This example uses `zstd` compression and results in a diff which is 1.4MB.
 It's important to specify a compression method, so that you don't end up with a diff which is the same size as the original. See these [arbitrary compression benchmarks](https://quixdb.github.io/squash-benchmark/#results) if you're interested in how various compression algorithms perform.
 
 You must tune the partition and chunk size parameters to your machine. If you take the defaults, it takes far too long to generate a diff.
+
+## Export Considerations
+
+The creation of the exported payloads becomes more complex than a normal godot app, using this system.  We want to create rust binaries for use in Mac, Windows, and Linux/X11 environments.
+
+### Setting up Cross-Compilation with Mac as Host
+
+You need to run [this script](setup-mac-build.sh) if you want to cross-compile
+from Mac to Linux. The SergioBenitez brew config is important.
+
+### Exported Payload
+
+The exported payload will now contain a library file specific to your client's gaming environment. For example, if you export as a Linux/X11 app, your deliverable has a `.so` library in addition to the `pck` and the executable:
+
+```text
+libincremental_patch.so linux-test.pck          linux-test.x86_64
+```
+
