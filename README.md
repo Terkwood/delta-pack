@@ -43,6 +43,6 @@ Assume the new file is 688MB, and assume we have 4 cores.  Then we can accomplis
 time bic diff target/App-0.1.4.pck target/App-0.1.5-example.pck /tmp/tryagain-bidiff.diff --sort-partitions 3 --scan-chunk-size 57000000 --method zstd
 ```
 
-Note that we specify a compression method, since we don't want to end up with a diff that's the same size as the original.
+This example uses `zstd` compression and results in a diff which is 1.4MB.  It's important to specify a compression method, so that you don't end up with a diff which is the same size as the original.  See these [arbitrary compression benchmarks](https://quixdb.github.io/squash-benchmark/#results) if you're interested in how various compression algorithms perform.
 
 The partitions and chunk size parameters are important.  You absolutely must tune these to your machine, or you'll be waiting for years for the algorithm to complete!
