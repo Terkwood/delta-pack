@@ -12,3 +12,11 @@ So far we are only demonstrating the live loading of a PCK file. A more complete
 
 You need to run [this script](setup-mac-build.sh) if you want to cross-compile
 from Mac to Linux. The SergioBenitez brew config is important.
+
+## Exported Payload
+
+For example, if you export as a Linux/X11 app, your deliverables will look like this:
+
+```text
+libincremental_patch.so linux-test.pck          linux-test.x86_64
+```
