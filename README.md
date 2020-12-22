@@ -30,3 +30,9 @@ git clone git@github.com:divvun/bidiff.git
 cd bidiff/crates/bic
 cargo install --path .
 ```
+
+Make a diff of `old new patch-output`:
+
+```sh
+bic diff Big-0.1.0.pck Big-0.1.1.pck Big-0.1.0_to_0.1.1.diff
+```
