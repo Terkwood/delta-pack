@@ -31,11 +31,10 @@ cd bidiff/crates/bic
 cargo install --path .
 ```
 
-Some reccs from the bidiff README:
+Some reccs from the [bidiff README](https://github.com/divvun/bidiff#what-makes-bidiff-different):
 ```text
-
-    partitions = (num_cores - 1) (this leaves a core for bookkeeping and compression)
-    chunk size = newer_size / (num_cores * k), where k is between 2 and 4;
+partitions = (num_cores - 1) (this leaves a core for bookkeeping and compression)
+chunk size = newer_size / (num_cores * k), where k is between 2 and 4;
 ```
 
 Assume the new file is 688MB, and assume we have 4 cores.  Then we can accomplish this patch creation in about 160sec:
