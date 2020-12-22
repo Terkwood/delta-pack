@@ -21,7 +21,7 @@ For example, if you export as a Linux/X11 app, your deliverables will look like 
 libincremental_patch.so linux-test.pck          linux-test.x86_64
 ```
 
-## Tinkering with bidiff
+## Using bidiff
 
 Install the barebones command line interface and create a diff:
 
