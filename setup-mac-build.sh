@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# You need to run this script if you're compiling from Mac to Linux
+
 # set up some cross compiling stuff on mac
 # https://stackoverflow.com/questions/41761485/how-to-cross-compile-from-mac-to-linux
 brew tap SergioBenitez/osxct
