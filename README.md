@@ -38,7 +38,7 @@ partitions = (num_cores - 1) (this leaves a core for bookkeeping and compression
 chunk size = newer_size / (num_cores * k), where k is between 2 and 4;
 ```
 
-Assume the new file is 688MB, and assume we have 4 cores. Then we can accomplish this patch creation in about 220sec:
+Assume the new file is 688MB, and assume we have 8 cores. Then we can accomplish this patch creation in about 220sec:
 
 ```sh
 time bic diff target/App-0.1.4.pck target/App-0.1.5-example.pck /tmp/tryagain-bidiff.diff --sort-partitions 7 --scan-chunk-size 28666666 --method zstd
