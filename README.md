@@ -31,8 +31,15 @@ cd bidiff/crates/bic
 cargo install --path .
 ```
 
-It takes a long time (30min+?!) to make a diff of a 630MB file.
+Some reccs from the bidiff README:
+```text
+
+    partitions = (num_cores - 1) (this leaves a core for bookkeeping and compression)
+    chunk size = newer_size / (num_cores * k), where k is between 2 and 4;
+```
+
+Assume the new file is 688MB, and assume we have 4 cores.  Then:
 
 ```sh
-bic diff Big-0.1.0.pck Big-0.1.1.pck Big-0.1.0_to_0.1.1.diff
+time bic diff target/App-0.1.4.pck target/App-0.1.5-example.pck /tmp/tryagain-bidiff.diff --sort-partitions 3 --scan-chunk-size 57000000
 ```
