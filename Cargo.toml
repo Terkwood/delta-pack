@@ -9,4 +9,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 gdnative = "0.9.1"
-bidiff = "1.0.0"
+bipatch = "1.0.0"
