@@ -13,7 +13,11 @@ So far we are only demonstrating the live loading of a PCK file. A more complete
 
 ## Using bidiff
 
-Install the barebones command line interface and create a diff:
+We can use `bidiff` to create and apply patches. 
+
+### Creating a patch with bic
+
+Install the barebones command line interface, `bic`, and create a diff:
 
 ```sh
 git clone git@github.com:divvun/bidiff.git
@@ -39,6 +43,20 @@ This example uses `zstd` compression and results in a diff which is 1.4MB.
 It's important to specify a compression method, so that you don't end up with a diff which is the same size as the original. See these [arbitrary compression benchmarks](https://quixdb.github.io/squash-benchmark/#results) if you're interested in how various compression algorithms perform.
 
 You must tune the partition and chunk size parameters to your machine. If you take the defaults, it takes far too long to generate a diff.
+
+### Testing patch application
+
+Just to measure how fast the patch application can be, let's use `bic` to apply a diff. 
+
+```text
+$ time bic patch App-0.1.4.pck /tmp/App-0.1.4_to_App-0.1.5-example_ZSTD.diff /tmp/App-reconstituted.pck --method zstd
+Using method Zstd
+bic patch App-0.1.4.pck /tmp/App-0.1.4_to_App-0.1.5-example_ZSTD.diff    0.87s user 1.41s system 121% cpu 1.885 total 
+```
+
+This is good news: regardless of what hardware is used, applying a patch will be considerably faster than generating one.
+
+In the context of a game needing to update its PCK file, we use the `bidiff` lib instrumented through `godot` and `rust`.
 
 ## Export Considerations
 
