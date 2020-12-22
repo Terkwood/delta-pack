@@ -24,10 +24,10 @@ impl IncrementalPatch {
     }
 
     #[export]
-    fn test_patch(&self, _owner: &Label, diff_bin_path: &str) {
+    fn test_patch(&self, _owner: &Label, diff_bin_path: GodotString) {
         patch(
             &PathBuf::from_str(OLD_PCK).expect("path to old PCK"),
-            &PathBuf::from_str(diff_bin_path).expect("path to diff bin"),
+            &PathBuf::from_str(&diff_bin_path.to_string()).expect("path to diff bin"),
             &PathBuf::from_str(OUT_PCK).expect("path to output PCK"),
         )
         .expect("boom")
