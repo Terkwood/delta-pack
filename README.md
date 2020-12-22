@@ -20,3 +20,27 @@ For example, if you export as a Linux/X11 app, your deliverables will look like 
 ```text
 libincremental_patch.so linux-test.pck          linux-test.x86_64
 ```
+
+## Tinkering with bidiff
+
+Install the barebones command line interface and create a diff:
+
+```sh
+git clone git@github.com:divvun/bidiff.git
+cd bidiff/crates/bic
+cargo install --path .
+```
+
+Some reccs from the [bidiff README](https://github.com/divvun/bidiff#what-makes-bidiff-different):
+```text
+partitions = (num_cores - 1) (this leaves a core for bookkeeping and compression)
+chunk size = newer_size / (num_cores * k), where k is between 2 and 4;
+```
+
+Assume the new file is 688MB, and assume we have 4 cores.  Then we can accomplish this patch creation in about 160sec:
+
+```sh
+time bic diff target/App-0.1.4.pck target/App-0.1.5-example.pck /tmp/tryagain-bidiff.diff --sort-partitions 3 --scan-chunk-size 57000000
+```
+
+The partitions and chunk size parameters are important.  You absolutely must tune these to your machine, or you'll be waiting for years for the algorithm to complete!
