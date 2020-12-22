@@ -11,9 +11,7 @@ use std::{
 
 #[derive(gdnative::NativeClass)]
 #[inherit(Label)]
-struct IncrementalPatch {
-    bogus: u32,
-}
+struct IncrementalPatch;
 
 const OLD_PCK: &str = "test-0.0.0.pck";
 const DIFF_BIN: &str = "test-0.0.0_to_test-0.0.0-DELTA.bin";
@@ -23,7 +21,7 @@ const OUT_PCK: &str = "test-0.0.0-DELTA.pck";
 #[gdnative::methods]
 impl IncrementalPatch {
     fn new(_owner: &Label) -> Self {
-        IncrementalPatch { bogus: 0 }
+        IncrementalPatch  
     }
 
     #[export]
@@ -38,7 +36,7 @@ impl IncrementalPatch {
 
     #[export]
     fn _ready(&mut self, _owner: &Label) {
-        godot_print!("Hello from rust with bogus value: {}", self.bogus)
+        godot_print!("Delta Pack ready");
     }
 }
 
