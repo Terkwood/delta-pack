@@ -7,3 +7,8 @@ So far we are only demonstrating the live loading of a PCK file.  A more complet
 [Read the planning ticket](https://github.com/Terkwood/godot-incremental-patch/issues/2).
 
 [See the official docs](https://godot-es-docs.readthedocs.io/en/latest/getting_started/workflow/export/exporting_pcks.html) for more information on Godot Engine's support for live-reloading of PCK (game payload) files.
+
+## Setting up Cross-Compilation with Mac as Host
+
+You need to run [this script](setup-mac.sh) if you want to cross-compile
+from Mac to Linux.  The SergioBenitez brew config is important.
