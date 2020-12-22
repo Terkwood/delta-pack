@@ -38,8 +38,10 @@ Some reccs from the bidiff README:
     chunk size = newer_size / (num_cores * k), where k is between 2 and 4;
 ```
 
-Assume the new file is 688MB, and assume we have 4 cores.  Then:
+Assume the new file is 688MB, and assume we have 4 cores.  Then we can accomplish this patch creation in about 160sec:
 
 ```sh
 time bic diff target/App-0.1.4.pck target/App-0.1.5-example.pck /tmp/tryagain-bidiff.diff --sort-partitions 3 --scan-chunk-size 57000000
 ```
+
+The partitions and chunk size parameters are important.  You absolutely must tune these to your machine, or you'll be waiting for years for the algorithm to complete!
