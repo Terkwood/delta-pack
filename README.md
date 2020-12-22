@@ -31,7 +31,7 @@ cd bidiff/crates/bic
 cargo install --path .
 ```
 
-Make a diff of `old new patch-output`:
+It takes a long time (30min+?!) to make a diff of a 630MB file.
 
 ```sh
 bic diff Big-0.1.0.pck Big-0.1.1.pck Big-0.1.0_to_0.1.1.diff
