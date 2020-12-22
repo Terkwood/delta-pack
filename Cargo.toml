@@ -1,6 +1,6 @@
 [package]
 name = "incremental_patch"
-version = "0.1.0"
+version = "0.0.0"
 authors = ["Terkwood <38859656+Terkwood@users.noreply.github.com>"]
 edition = "2018"
 
@@ -9,3 +9,9 @@ crate-type = ["cdylib"]
 
 [dependencies]
 gdnative = "0.9.1"
+bipatch = "1.0.0"
+bidiff = "1.0.0"
+pipe = "0.4.0"
+anyhow = "1.0.36"
+comde = "0.1.0"
+
