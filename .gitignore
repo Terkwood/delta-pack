@@ -1,4 +1,6 @@
 # Export dir
+export/
+# Rust binaries
 target/
 
 # Godot-specific ignores
