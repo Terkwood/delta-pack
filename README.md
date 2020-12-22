@@ -20,3 +20,13 @@ For example, if you export as a Linux/X11 app, your deliverables will look like 
 ```text
 libincremental_patch.so linux-test.pck          linux-test.x86_64
 ```
+
+## Tinkering with bidiff
+
+Install the barebones command line interface and create a diff:
+
+```sh
+git clone git@github.com:divvun/bidiff.git
+cd bidiff/crates/bic
+cargo install --path .
+```
