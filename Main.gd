@@ -34,7 +34,7 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 	else:
 		printerr("Bad response to delta bin request: %d" % response_code)
 		var warning_label = Label.new()
-		warning_label.text = "Make sure you start the mock metadata server via `sh mock-metadata-server/run.sh`"
+		warning_label.text = "Make sure you start the mock patch server via `sh mock-patch-server/run.sh`"
 		warning_label.autowrap = true
 		warning_label.anchor_left = 0
 		warning_label.anchor_right = 1
