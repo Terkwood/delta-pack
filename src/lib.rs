@@ -24,6 +24,17 @@ impl IncrementalPatch {
     }
 
     #[export]
+    fn verify_checksum(
+        &self,
+        _owner: &Label,
+        reconstituted_pck_path: GodotString,
+        sha512_hash: GodotString,
+    ) -> bool {
+        todo!("compute sha512 from the reconstituted PCK file");
+        todo!("compare to provided sha512 hash")
+    }
+
+    #[export]
     fn test_patch(&self, _owner: &Label, diff_bin_path: GodotString) {
         patch(
             &PathBuf::from_str(OLD_PCK).expect("path to old PCK"),
