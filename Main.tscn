@@ -51,8 +51,5 @@ script = ExtResource( 3 )
 [node name="MetadataRequest" type="HTTPRequest" parent="."]
 
 [node name="DeltaBinRequest" type="HTTPRequest" parent="."]
-
-[node name="Timer" type="Timer" parent="."]
 [connection signal="request_completed" from="MetadataRequest" to="." method="_on_MetadataRequest_request_completed"]
 [connection signal="request_completed" from="DeltaBinRequest" to="." method="_on_DeltaBinRequest_request_completed"]
-[connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]

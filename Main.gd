@@ -29,12 +29,9 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 		if patch_status:
 			patch_status.test_patch(_PATCH_NAME)
 			
-			#ProjectSettings.load_resource_pack("res://test-0.0.0-DELTA.pck")
-			#get_tree().change_scene("res://Main.tscn")
+			ProjectSettings.load_resource_pack("res://test-0.0.0-DELTA.pck")
+			get_tree().change_scene("res://Main.tscn")
 
 	else:
 		printerr("Bad response to delta bin request: %d" % response_code)
 
-
-func _on_Timer_timeout():
-	pass # Replace with function body.
