@@ -23,14 +23,15 @@ impl IncrementalPatch {
         IncrementalPatch
     }
 
+    /// Verifies that a file hashes to the expected value
     #[export]
     fn verify_checksum(
         &self,
         _owner: &Label,
-        reconstituted_pck_path: GodotString,
+        file_path: GodotString,
         sha512_hash: GodotString,
     ) -> bool {
-        todo!("compute sha512 from the reconstituted PCK file");
+        todo!("compute sha512 from the file");
         todo!("compare to provided sha512 hash")
     }
 
