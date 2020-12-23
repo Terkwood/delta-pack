@@ -31,7 +31,13 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 			
 			ProjectSettings.load_resource_pack("res://test-0.0.0-DELTA.pck")
 			get_tree().change_scene("res://Main.tscn")
-
 	else:
 		printerr("Bad response to delta bin request: %d" % response_code)
-
+		var warning_label = Label.new()
+		warning_label.text = "Make sure you start the mock metadata server via `sh mock-metadata-server/run.sh`"
+		warning_label.autowrap = true
+		warning_label.anchor_left = 0
+		warning_label.anchor_right = 1
+		$CenterContainer/VBoxContainer.add_child(warning_label)
+		$"CenterContainer/VBoxContainer/Patch Status".hide()
+		$CenterContainer/VBoxContainer/TextureRect.hide()
