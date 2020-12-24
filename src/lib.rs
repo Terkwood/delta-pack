@@ -37,7 +37,7 @@ impl IncrementalPatch {
                 fs::File::open(&file_path.to_string())
                     .and_then(|mut file| {
                         Ok(compute_checksum(&mut file)
-                            .map(|actual_checksum| actual_checksum == expected)
+                            .map(|actual| actual == expected)
                             .unwrap_or(false))
                     })
                     .map_err(|e| e.into())
@@ -104,7 +104,8 @@ fn compute_checksum<R: Read>(reader: &mut R) -> Result<blake3::Hash> {
 fn make_hash(gs: GodotString) -> Result<blake3::Hash> {
     use std::convert::TryInto;
     let hash_bytes = hex::decode(gs.to_string())?;
-    todo!()
+    let hash_array: [u8; blake3::OUT_LEN] = hash_bytes[..].try_into()?;
+    Ok(hash_array.into())
 }
 
 fn init(handle: InitHandle) {
