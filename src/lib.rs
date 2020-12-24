@@ -32,17 +32,20 @@ impl IncrementalPatch {
         file_path: GodotString,
         expected_checksum: GodotString,
     ) -> bool {
-        if let Ok(mut file) = fs::File::open(&file_path.to_string()) {
-            if let Ok(actual_checksum) = compute_checksum(&mut file) {
-                actual_checksum == make_hash(expected_checksum)
-            } else {
-                godot_print!("could not compute checksum against file");
-                false
-            }
-        } else {
-            godot_print!("fail to open file");
-            false
-        }
+        make_hash(expected_checksum)
+            .and_then(|expected| {
+                fs::File::open(&file_path.to_string())
+                    .map(|mut file| {
+                        if let Ok(actual_checksum) = compute_checksum(&mut file) {
+                            actual_checksum == expected
+                        } else {
+                            godot_print!("could not compute checksum against file");
+                            false
+                        }
+                    })
+                    .map_err(|e| e.into())
+            })
+            .unwrap_or(false)
     }
 
     /// Apply a patch, as in https://github.com/divvun/bidiff/blob/1e6571e8f36bba3292b33a4b7dfe4ce93a3abd1e/crates/bic/src/main.rs#L257
@@ -101,7 +104,9 @@ fn compute_checksum<R: Read>(reader: &mut R) -> Result<blake3::Hash> {
     Ok(hasher.finalize())
 }
 
-fn make_hash(_gs: GodotString) -> blake3::Hash {
+fn make_hash(gs: GodotString) -> Result<blake3::Hash> {
+    use std::convert::TryInto;
+    let hash_bytes = hex::decode(gs.to_string())?;
     todo!()
 }
 
