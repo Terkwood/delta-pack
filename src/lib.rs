@@ -1,6 +1,8 @@
 use anyhow::{Context, Result};
 use gdnative::api::*;
 use gdnative::prelude::*;
+use std::fs;
+use std::io::Read;
 use std::{
     fs::File,
     io::{self, BufReader, BufWriter},
@@ -28,11 +30,19 @@ impl IncrementalPatch {
         &self,
         _owner: &Label,
         file_path: GodotString,
-        blake3_hash: GodotString,
+        expected_checksum: GodotString,
     ) -> bool {
-        todo!("compute blake3 from the file");
-        todo!("you can test with b3sum");
-        todo!("compare to provided blake3 hash")
+        if let Ok(mut file) = fs::File::open(&file_path.to_string()) {
+            if let Ok(actual_checksum) = compute_checksum(&mut file) {
+                actual_checksum == make_hash(expected_checksum)
+            } else {
+                godot_print!("could not compute checksum against file");
+                false
+            }
+        } else {
+            godot_print!("fail to open file");
+            false
+        }
     }
 
     /// Apply a patch, as in https://github.com/divvun/bidiff/blob/1e6571e8f36bba3292b33a4b7dfe4ce93a3abd1e/crates/bic/src/main.rs#L257
@@ -75,6 +85,24 @@ fn patch(older: &PathBuf, patch: &PathBuf, output: &PathBuf) -> Result<()> {
     godot_print!("Patch applied in {:?}", start.elapsed());
 
     Ok(())
+}
+
+const BUFFER_SIZE: usize = 1024;
+fn compute_checksum<R: Read>(reader: &mut R) -> Result<blake3::Hash> {
+    let mut hasher = blake3::Hasher::new();
+    let mut buffer = [0u8; BUFFER_SIZE];
+    loop {
+        let n = reader.read(&mut buffer)?;
+        hasher.update(&buffer[..n]);
+        if n == 0 || n < BUFFER_SIZE {
+            break;
+        }
+    }
+    Ok(hasher.finalize())
+}
+
+fn make_hash(_gs: GodotString) -> blake3::Hash {
+    todo!()
 }
 
 fn init(handle: InitHandle) {
