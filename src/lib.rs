@@ -35,13 +35,24 @@ impl IncrementalPatch {
     ) -> bool {
         hex::decode(expected_checksum.to_string())
             .and_then(|expected| {
-                Ok(fs::File::open(&file_path.to_string())
+                let f = file_path.to_string();
+                Ok(fs::File::open(&f)
                     .and_then(|mut file| {
-                        Ok(compute_checksum(&mut file)
-                            .map(|actual| actual == expected)
-                            .unwrap_or(false))
+                        let computed = compute_checksum(&mut file);
+                        Ok(computed
+                            .map(|actual| {
+                                godot_print!("computed {}", hex::encode(actual.clone()));
+                                actual == expected
+                            })
+                            .unwrap_or({
+                                godot_print!("cannot compute checksum");
+                                false
+                            }))
                     })
-                    .unwrap_or(false))
+                    .unwrap_or({
+                        godot_print!("cannot open file {}", f);
+                        false
+                    }))
             })
             .unwrap_or(false)
     }

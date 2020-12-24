@@ -4,8 +4,8 @@ use std::env::args;
 use std::fs;
 use std::io::Read;
 fn main() {
-    let arg0 = args().nth(0).expect("need a file arg");
-    if let Ok(mut file) = fs::File::open(arg0) {
+    let arg1 = args().nth(1).expect("need a file arg");
+    if let Ok(mut file) = fs::File::open(arg1) {
         if let Ok(checksum) = compute_checksum(&mut file) {
             println!("{}", hex::encode(checksum))
         } else {
