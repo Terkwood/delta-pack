@@ -35,13 +35,10 @@ impl IncrementalPatch {
         make_hash(expected_checksum)
             .and_then(|expected| {
                 fs::File::open(&file_path.to_string())
-                    .map(|mut file| {
-                        if let Ok(actual_checksum) = compute_checksum(&mut file) {
-                            actual_checksum == expected
-                        } else {
-                            godot_print!("could not compute checksum against file");
-                            false
-                        }
+                    .and_then(|mut file| {
+                        Ok(compute_checksum(&mut file)
+                            .map(|actual_checksum| actual_checksum == expected)
+                            .unwrap_or(false))
                     })
                     .map_err(|e| e.into())
             })
