@@ -8,3 +8,4 @@ edition = "2018"
 
 [dependencies]
 blake2 = "0.9.1"
+anyhow = "1.0.36"
