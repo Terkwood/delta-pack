@@ -1,6 +1,9 @@
 use anyhow::{Context, Result};
+use blake2::{Blake2b, Digest};
 use gdnative::api::*;
 use gdnative::prelude::*;
+use std::fs;
+use std::io::Read;
 use std::{
     fs::File,
     io::{self, BufReader, BufWriter},
@@ -16,13 +19,45 @@ struct IncrementalPatch;
 const OLD_PCK: &str = "test-0.0.0.pck";
 const OUT_PCK: &str = "test-0.0.0-DELTA.pck";
 
-/// Apply a patch, as in https://github.com/divvun/bidiff/blob/1e6571e8f36bba3292b33a4b7dfe4ce93a3abd1e/crates/bic/src/main.rs#L257
 #[gdnative::methods]
 impl IncrementalPatch {
     fn new(_owner: &Label) -> Self {
         IncrementalPatch
     }
 
+    /// Verifies that a file hashes to the expected value
+    #[export]
+    fn verify_checksum(
+        &self,
+        _owner: &Label,
+        file_path: GodotString,
+        expected_checksum: GodotString,
+    ) -> bool {
+        hex::decode(expected_checksum.to_string())
+            .and_then(|expected| {
+                let f = file_path.to_string();
+                Ok(fs::File::open(&f)
+                    .and_then(|mut file| {
+                        let computed = compute_checksum(&mut file);
+                        Ok(computed
+                            .map(|actual| {
+                                godot_print!("computed {}", hex::encode(actual.clone()));
+                                actual == expected
+                            })
+                            .unwrap_or({
+                                godot_print!("cannot compute checksum");
+                                false
+                            }))
+                    })
+                    .unwrap_or({
+                        godot_print!("cannot open file {}", f);
+                        false
+                    }))
+            })
+            .unwrap_or(false)
+    }
+
+    /// Apply a patch, as in https://github.com/divvun/bidiff/blob/1e6571e8f36bba3292b33a4b7dfe4ce93a3abd1e/crates/bic/src/main.rs#L257
     #[export]
     fn test_patch(&self, _owner: &Label, diff_bin_path: GodotString) {
         patch(
@@ -62,6 +97,20 @@ fn patch(older: &PathBuf, patch: &PathBuf, output: &PathBuf) -> Result<()> {
     godot_print!("Patch applied in {:?}", start.elapsed());
 
     Ok(())
+}
+
+const BUFFER_SIZE: usize = 1024;
+fn compute_checksum<R: Read>(reader: &mut R) -> Result<Vec<u8>> {
+    let mut hasher = Blake2b::new();
+    let mut buffer = [0u8; BUFFER_SIZE];
+    loop {
+        let n = reader.read(&mut buffer)?;
+        hasher.update(&buffer[..n]);
+        if n == 0 || n < BUFFER_SIZE {
+            break;
+        }
+    }
+    Ok(hasher.finalize().to_vec())
 }
 
 fn init(handle: InitHandle) {
