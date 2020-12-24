@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use blake2::{Blake2b, Digest};
 use gdnative::api::*;
 use gdnative::prelude::*;
 use std::fs;
@@ -32,17 +33,20 @@ impl IncrementalPatch {
         file_path: GodotString,
         expected_checksum: GodotString,
     ) -> bool {
-        make_hash(expected_checksum)
-            .and_then(|expected| {
-                fs::File::open(&file_path.to_string())
-                    .and_then(|mut file| {
-                        Ok(compute_checksum(&mut file)
-                            .map(|actual| actual == expected)
-                            .unwrap_or(false))
-                    })
-                    .map_err(|e| e.into())
+        // make_hash(expected_checksum)
+        //     .and_then(|expected| {
+
+        let expected: Vec<u8> = todo!("expected checksum as bytes");
+        fs::File::open(&file_path.to_string())
+            .and_then(|mut file| {
+                Ok(compute_checksum(&mut file)
+                    .map(|actual| actual == expected)
+                    .unwrap_or(false))
             })
             .unwrap_or(false)
+        //   .map_err(|e| e.into())
+        //     })
+        //     .unwrap_or(false)
     }
 
     /// Apply a patch, as in https://github.com/divvun/bidiff/blob/1e6571e8f36bba3292b33a4b7dfe4ce93a3abd1e/crates/bic/src/main.rs#L257
@@ -88,8 +92,8 @@ fn patch(older: &PathBuf, patch: &PathBuf, output: &PathBuf) -> Result<()> {
 }
 
 const BUFFER_SIZE: usize = 1024;
-fn compute_checksum<R: Read>(reader: &mut R) -> Result<blake3::Hash> {
-    let mut hasher = blake3::Hasher::new();
+fn compute_checksum<R: Read>(reader: &mut R) -> Result<Vec<u8>> {
+    let mut hasher = Blake2b::new();
     let mut buffer = [0u8; BUFFER_SIZE];
     loop {
         let n = reader.read(&mut buffer)?;
@@ -98,14 +102,7 @@ fn compute_checksum<R: Read>(reader: &mut R) -> Result<blake3::Hash> {
             break;
         }
     }
-    Ok(hasher.finalize())
-}
-
-fn make_hash(gs: GodotString) -> Result<blake3::Hash> {
-    use std::convert::TryInto;
-    let hash_bytes = hex::decode(gs.to_string())?;
-    let hash_array: [u8; blake3::OUT_LEN] = hash_bytes[..].try_into()?;
-    Ok(hash_array.into())
+    Ok(hasher.finalize().to_vec())
 }
 
 fn init(handle: InitHandle) {
