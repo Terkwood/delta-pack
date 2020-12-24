@@ -6,10 +6,13 @@ use std::io::Read;
 fn main() {
     let arg0 = args().nth(0).expect("need a file arg");
     if let Ok(mut file) = fs::File::open(arg0) {
-        let _checksum = compute_checksum(&mut file);
-        todo!()
+        if let Ok(checksum) = compute_checksum(&mut file) {
+            println!("{}", hex::encode(checksum))
+        } else {
+            panic!("checksum compute failed")
+        }
     } else {
-        panic!("no")
+        panic!("file open failed")
     }
 }
 
