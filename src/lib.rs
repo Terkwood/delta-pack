@@ -31,6 +31,7 @@ impl IncrementalPatch {
         blake3_hash: GodotString,
     ) -> bool {
         todo!("compute blake3 from the file");
+        todo!("you can test with b3sum");
         todo!("compare to provided blake3 hash")
     }
 
