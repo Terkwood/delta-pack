@@ -29,6 +29,12 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 		if patch_status:
 			patch_status.test_patch(_PATCH_NAME)
 			
+			
+			if patch_status.verify_checksum("res://test-0.0.0-DELTA.pck"):
+				print("validated checksum of output PCK")
+			else:
+				printerr("FAILED CHECKSUM !!! ABORT !!!")
+			
 			ProjectSettings.load_resource_pack("res://test-0.0.0-DELTA.pck")
 			get_tree().change_scene("res://Main.tscn")
 	else:
