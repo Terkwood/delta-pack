@@ -33,20 +33,17 @@ impl IncrementalPatch {
         file_path: GodotString,
         expected_checksum: GodotString,
     ) -> bool {
-        // make_hash(expected_checksum)
-        //     .and_then(|expected| {
-
-        let expected: Vec<u8> = todo!("expected checksum as bytes");
-        fs::File::open(&file_path.to_string())
-            .and_then(|mut file| {
-                Ok(compute_checksum(&mut file)
-                    .map(|actual| actual == expected)
+        hex::decode(expected_checksum.to_string())
+            .and_then(|expected| {
+                Ok(fs::File::open(&file_path.to_string())
+                    .and_then(|mut file| {
+                        Ok(compute_checksum(&mut file)
+                            .map(|actual| actual == expected)
+                            .unwrap_or(false))
+                    })
                     .unwrap_or(false))
             })
             .unwrap_or(false)
-        //   .map_err(|e| e.into())
-        //     })
-        //     .unwrap_or(false)
     }
 
     /// Apply a patch, as in https://github.com/divvun/bidiff/blob/1e6571e8f36bba3292b33a4b7dfe4ce93a3abd1e/crates/bic/src/main.rs#L257
