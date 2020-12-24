@@ -1,7 +1,6 @@
 use anyhow::{Context, Result};
 use gdnative::api::*;
 use gdnative::prelude::*;
-use sha2::{Digest, Sha512};
 use std::{
     fs::File,
     io::{self, BufReader, BufWriter},
@@ -29,12 +28,10 @@ impl IncrementalPatch {
         &self,
         _owner: &Label,
         file_path: GodotString,
-        sha512_hash: GodotString,
+        blake3_hash: GodotString,
     ) -> bool {
-        todo!("compute sha512 from the file");
-        todo!("e.g. with the example: ");
-        todo!("cargo run --example sha512sum -- /tmp/junk.txt");
-        todo!("compare to provided sha512 hash")
+        todo!("compute blake3 from the file");
+        todo!("compare to provided blake3 hash")
     }
 
     /// Apply a patch, as in https://github.com/divvun/bidiff/blob/1e6571e8f36bba3292b33a4b7dfe4ce93a3abd1e/crates/bic/src/main.rs#L257
