@@ -1,16 +1,20 @@
 #[macro_use]
 extern crate lazy_static;
+#[macro_use]
+extern crate serde_derive;
 
 use regex::Regex;
+use sled::IVec;
 use structopt::StructOpt;
 use validator::Validate;
+
 lazy_static! {
     static ref RE_HEX: Regex = Regex::new(r"^[0-9a-fA-F]+$").unwrap();
     /// See https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
     static ref RE_SEMVER: Regex = Regex::new(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$").unwrap();
 }
-#[derive(StructOpt, Debug, Validate)]
-#[structopt(name = "metadata-writer")]
+#[derive(StructOpt, Debug, Validate, Serialize, Deserialize)]
+#[structopt(name = "write-delta")]
 struct Delta {
     /// The current version of the PCK file
     #[validate(regex = "RE_SEMVER")]
@@ -45,25 +49,18 @@ fn main() -> sled::Result<()> {
         eprintln!("Failed to validate input: {}", e);
         std::process::exit(1)
     }
-    println!("{:#?}", delta);
+    println!("Writing delta: {:#?}", delta);
 
     // this directory will be created if it does not exist
     let path = "/tmp/metadata-tmp";
 
-    // works like std::fs::open
     let db = sled::open(path)?;
 
-    // key and value types can be `Vec<u8>`, `[u8]`, or `str`.
-    let key = "delta-metadata";
+    let id = db.generate_id()?;
 
-    // `generate_id`
-    let _value = db.generate_id()?.to_be_bytes();
+    let key = format!("deltas/{}", id);
 
-    dbg!(
-        //db.insert(key, &value)?, // as in BTreeMap::insert
-        db.get(key)?, // as in BTreeMap::get
-                      //db.remove(key)?,         // as in BTreeMap::remove
-    );
-
+    let value = bincode::serialize(&delta).expect("serialize");
+    db.insert(key, &IVec::from(value))?;
     Ok(())
 }
