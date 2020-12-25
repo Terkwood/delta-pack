@@ -4,7 +4,7 @@
 
 ![Live loading a PCK file](https://user-images.githubusercontent.com/38859656/102728162-25e4b400-42f8-11eb-9265-a3a93e32aab1.gif)
 
-So far we are only demonstrating the live loading of a PCK file. A more complete example of incremental patching will hopefully be delivered soon.
+This project  currently demonstrates applying a diff of a pack file to an older version to create a new PCK file. It can then load the updated PCK. Everything is hardcoded, but we are in the process of adding a publishing process and a simple, public webserver which can be queried for metadata about new versions ("deltas").
 
 [Read the planning ticket](https://github.com/Terkwood/godot-incremental-patch/issues/2).
 
