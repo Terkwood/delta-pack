@@ -31,7 +31,9 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 			
 			# note this isn't sandbox-safe file naming for godot ...
 			#   ... as the file is opened by rust !!   ... watch out
-			if patch_status.verify_checksum("test-0.0.0-DELTA.pck", "80417e1017a3be2e153fd5e8fbf342d30861a14ae15488c3cf1a850fac98e3c1f5a2e6c2262ce1bb70c3cd23c9a1a01fa8ba24fab9d24138849e81bdc8eebd49"):
+			var pck_chksum_ok = patch_status.verify_checksum("test-0.0.0-DELTA.pck", "80417e1017a3be2e153fd5e8fbf342d30861a14ae15488c3cf1a850fac98e3c1f5a2e6c2262ce1bb70c3cd23c9a1a01fa8ba24fab9d24138849e81bdc8eebd49")
+			print("is it ok ?! %s" % pck_chksum_ok)
+			if pck_chksum_ok:
 				print("validated checksum of output PCK")			
 				print("LOADING BRAVE NEW PACK")
 				ProjectSettings.load_resource_pack("res://test-0.0.0-DELTA.pck")
