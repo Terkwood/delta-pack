@@ -5,7 +5,7 @@ use regex::Regex;
 use structopt::StructOpt;
 use validator::Validate;
 lazy_static! {
-    static ref RE_HEX: Regex = Regex::new(r"[0-9a-fA-F]+$").unwrap();
+    static ref RE_HEX: Regex = Regex::new(r"^[0-9a-fA-F]+$").unwrap();
 }
 #[derive(StructOpt, Debug, Validate)]
 #[structopt(name = "metadata-writer")]
@@ -28,6 +28,10 @@ struct Delta {
 
 fn main() -> sled::Result<()> {
     let delta = Delta::from_args();
+    if let Err(e) = delta.validate() {
+        eprintln!("Failed to validate input: {}", e);
+        std::process::exit(1)
+    }
     println!("{:#?}", delta);
 
     // this directory will be created if it does not exist
