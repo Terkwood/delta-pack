@@ -98,11 +98,19 @@ fn main() -> sled::Result<()> {
 
     let id = db.generate_id()?;
 
-    let key = format!("deltas/{}", id);
+    let delta_key = format!("deltas/{}", id);
 
-    let delta = Delta::from((id, opts));
-    println!("Writing delta: {:#?}", delta);
-    let value = bincode::serialize(&delta).expect("serialize");
-    db.insert(key, &IVec::from(value))?;
+    let delta_value = Delta::from((id, opts));
+    println!("Writing delta: {:#?}", delta_value);
+
+    db.insert(
+        delta_key,
+        &IVec::from(bincode::serialize(&delta_value).expect("serialize")),
+    )?;
+
+    // version -> ID lookup
+    let version_id_key = format!("version-ids/{}", delta_value.release_version);
+    db.insert(version_id_key, &id.to_be_bytes())?;
+
     Ok(())
 }
