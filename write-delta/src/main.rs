@@ -49,7 +49,7 @@ struct Opts {
     expected_pck_b2bsum: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Delta {
     pub id: u64,
     pub release_version: String,
@@ -90,7 +90,6 @@ fn main() -> sled::Result<()> {
         eprintln!("Failed to validate input: {}", e);
         std::process::exit(1)
     }
-    println!("Writing delta: {:#?}", opts);
 
     // this directory will be created if it does not exist
     let path = &opts.data_dir;
@@ -101,7 +100,9 @@ fn main() -> sled::Result<()> {
 
     let key = format!("deltas/{}", id);
 
-    let value = bincode::serialize(&Delta::from((id, opts))).expect("serialize");
+    let delta = Delta::from((id, opts));
+    println!("Writing delta: {:#?}", delta);
+    let value = bincode::serialize(&delta).expect("serialize");
     db.insert(key, &IVec::from(value))?;
     Ok(())
 }
