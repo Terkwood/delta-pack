@@ -3,10 +3,9 @@ extern crate lazy_static;
 #[macro_use]
 extern crate serde_derive;
 
-use std::path::PathBuf;
-
 use regex::Regex;
 use sled::IVec;
+use std::path::PathBuf;
 use structopt::StructOpt;
 use validator::Validate;
 
@@ -97,8 +96,7 @@ fn main() -> sled::Result<()> {
     let db = sled::open(path)?;
 
     let id = db.generate_id()?;
-
-    let delta_key = format!("deltas/{}", id);
+    let delta_key = id.to_be_bytes();
 
     let delta_value = Delta::from((id, opts));
     println!("Writing delta: {:#?}", delta_value);
@@ -108,9 +106,8 @@ fn main() -> sled::Result<()> {
         &IVec::from(bincode::serialize(&delta_value).expect("serialize")),
     )?;
 
-    // version -> ID lookup
-    let version_id_key = format!("version-ids/{}", delta_value.release_version);
-    db.insert(version_id_key, &id.to_be_bytes())?;
+    let version_id_tree: sled::Tree = db.open_tree(b"version->id lookup")?;
+    version_id_tree.insert(&delta_value.release_version, &id.to_be_bytes())?;
 
     Ok(())
 }
