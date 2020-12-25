@@ -93,7 +93,7 @@ fn main() -> sled::Result<()> {
     println!("Writing delta: {:#?}", opts);
 
     // this directory will be created if it does not exist
-    let path = "/tmp/metadata-tmp";
+    let path = opts.data_dir;
 
     let db = sled::open(path)?;
 
