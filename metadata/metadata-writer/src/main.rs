@@ -8,15 +8,16 @@ lazy_static! {
     static ref RE_HEX: Regex = Regex::new(r"[0-9a-fA-F]+$").unwrap();
 }
 #[derive(StructOpt, Debug, Validate)]
+#[structopt(name = "metadata-writer")]
 struct Delta {
     /// URL for the diff binary
     #[validate(url)]
-    #[structopt(short, long)]
+    #[structopt(long)]
     diff_url: String,
 
     /// Hex string checksum for the diff binary
     #[validate(regex = "RE_HEX")]
-    #[structopt(short, long)]
+    #[structopt(long)]
     diff_blake2: String,
 
     /// Hex string checksum for the expected PCK file
@@ -26,6 +27,9 @@ struct Delta {
 }
 
 fn main() -> sled::Result<()> {
+    let delta = Delta::from_args();
+    println!("{:#?}", delta);
+
     // this directory will be created if it does not exist
     let path = "/tmp/metadata-tmp";
 
