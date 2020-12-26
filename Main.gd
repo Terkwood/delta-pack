@@ -22,8 +22,6 @@ func _ready():
 
 func _load_final_pack(pck_file):
 	print("LOADING BRAVE NEW PACK")
-				
-	### TODO!  We shouldn't load until we're done with everything
 	ProjectSettings.load_resource_pack(pck_file)
 	get_tree().change_scene("res://Main.tscn")
 
@@ -115,3 +113,27 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 		$"CenterContainer/VBoxContainer/Patch Status".hide()
 		$CenterContainer/VBoxContainer/TextureRect.hide()
 
+func _current_pck_path():
+	return _HACK_INPUT_PCK_NAME
+func _user_pck_path(version):
+	return "user://%s.pck"
+
+const _USER_PREFIX = "user://"
+func _user_path_to_os(path: String):
+	var norm = path.strip_edges().to_lower()
+	var parts = norm.split(_USER_PREFIX)
+	if parts.size() != 2:
+		return path
+	var rem = parts[1]
+	
+	var app_name = ProjectSettings.get("application/config/name")
+	match OS.get_name():
+		"Windows":
+			return "%APPDATA%/%s" % app_name
+		"X11":
+			return "~/.local/share/godot/app_userdata/%s" % app_name
+		"OSX":
+			return "~/.local/share/godot/app_userdata/%s" % app_name
+		_:
+			printerr("OS not supported")
+			return null
