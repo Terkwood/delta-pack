@@ -35,7 +35,7 @@ func _load_final_pack(pck_file):
 func _fetch_next_diff():
 	if _diffs_to_fetch.empty():
 		_fetching = null
-		print("All updates applied!")
+		print("All patches applied!")
 		_load_final_pack(_HACK_OUTPUT_PCK_NAME)
 		return
 	else:
@@ -48,7 +48,7 @@ func _fetch_next_diff():
 			var delta_bin_request = get_node_or_null("DeltaBinRequest")
 			if delta_bin_request:
 				delta_bin_request.request(diff_url)
-			print("fetching from %s" % diff_url)
+			print("Fetching %s" % diff_url)
 			return
 		else:
 			printerr("Cannot apply patch: malformed delta response")
