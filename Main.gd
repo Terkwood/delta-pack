@@ -10,8 +10,8 @@ func _ready():
 		version_label.text = "Running v%s" % app_version
 	
 	var metadata_request = get_node_or_null("MetadataRequest")
-	if metadata_request:
-		metadata_request.request("https://jsonplaceholder.typicode.com/todos/1")
+	if metadata_request and app_version:
+		metadata_request.request("http://127.0.0.1:45819/deltas?from_version=%s" % app_version)
 	
 	var delta_bin_request = get_node_or_null("DeltaBinRequest")
 	if delta_bin_request:
@@ -20,7 +20,7 @@ func _ready():
 
 func _on_MetadataRequest_request_completed(result, response_code, headers, body):
 	var json = JSON.parse(body.get_string_from_utf8())
-	print("Fake metadata result: %s" % json.result)
+	print("Delta-server response: %s" % json.result)
 
 
 func _on_DeltaBinRequest_request_completed(result, response_code, headers, body):
