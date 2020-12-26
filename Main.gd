@@ -33,7 +33,7 @@ func _fetch_next_diff():
 			var delta_bin_request = get_node_or_null("DeltaBinRequest")
 			if delta_bin_request:
 				delta_bin_request.request(diff_url)
-			print("ok")
+			print("fetching from %s" % diff_url)
 			return MoreDiffs.YES
 		else:
 			printerr("Cannot apply patch: malformed delta response")
@@ -45,6 +45,7 @@ func _on_MetadataRequest_request_completed(result, response_code, headers, body)
 		print("Fetching %d patches" % json.result.size())
 		_deltas = json.result
 		_diffs_to_fetch = json.result
+		_fetch_next_diff()
 	else:
 		printerr("Not an array")
 
