@@ -43,9 +43,9 @@ impl IncrementalPatch {
             .unwrap_or(false)
     }
 
-    /// Apply a patch, as in https://github.com/divvun/bidiff/blob/1e6571e8f36bba3292b33a4b7dfe4ce93a3abd1e/crates/bic/src/main.rs#L257
+    /// Apply a diff to create a new PCK file. See https://github.com/divvun/bidiff/blob/1e6571e8f36bba3292b33a4b7dfe4ce93a3abd1e/crates/bic/src/main.rs#L257
     #[export]
-    fn apply_patch(
+    fn apply_diff(
         &self,
         _owner: &Label,
         input_pck_path: GodotString,

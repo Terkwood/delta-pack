@@ -60,18 +60,26 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 			printerr("failed to determine diff URL to save patch")
 			return
 		var su = diff_url.split("/")
-		var patch_name = su[su.size() - 1]
-		if !patch_name:
+		var diff_file_path = su[su.size() - 1]
+		if !diff_file_path:
 			printerr("failed to determine file name to save patch")
 			return
-		var file = File.new() 
-		file.open(patch_name, File.WRITE)
+		var file = File.new()
+		file.open(diff_file_path, File.WRITE)
 		file.store_buffer(body)
 		file.close()
 		
 		var patch_status = get_node_or_null("CenterContainer/VBoxContainer/Patch Status")
 		if patch_status:
-			if !patch_status.apply_patch(_HACK_INPUT_PCK_NAME, patch_name, _HACK_OUTPUT_PCK_NAME):
+			var diff_b2bsum = _fetching['diff_b2bsum']
+			if !diff_b2bsum:
+				printerr("Unknown checksum for diff, aborting")
+				return
+			if !patch_status.verify_checksum(diff_file_path, diff_b2bsum):
+				printerr("diff failed checksum verification")
+				return
+			
+			if !patch_status.apply_diff(_HACK_INPUT_PCK_NAME, diff_file_path, _HACK_OUTPUT_PCK_NAME):
 				printerr("Could not apply patch")
 				return
 			
