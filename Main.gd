@@ -35,7 +35,7 @@ func _load_final_pack(pck_file):
 func _fetch_next_diff():
 	if _diffs_to_fetch.empty():
 		_fetching = null
-		print("Done fetching diffs")
+		print("All updates applied!")
 		_load_final_pack(_HACK_OUTPUT_PCK_NAME)
 		return
 	else:
@@ -93,6 +93,7 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 			if !patch_status.verify_checksum(_user_path_to_os(diff_file_path), diff_b2bsum):
 				printerr("diff failed checksum verification")
 				return
+			print("Checksum OK: %s" % diff_file_path_last_part)
 			
 			var release_version = _fetching['release_version']
 			if !release_version:
@@ -110,7 +111,7 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 			
 			var pck_chksum_ok = patch_status.verify_checksum(_user_path_to_os(output_pck_path), expected_pck_b2bsum)
 			if pck_chksum_ok:
-				print("validated checksum of output PCK")			
+				print("Checksum OK: v%s PCK" % release_version)
 				_fetch_next_diff()
 			else:
 				printerr("FAILED CHECKSUM !!! ABORT !!!")
@@ -126,6 +127,10 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 		$"CenterContainer/VBoxContainer/Patch Status".hide()
 		$CenterContainer/VBoxContainer/TextureRect.hide()
 
+# Placeholder: we need some way to bootstrap figuring
+#   out the initial PCK based on the app name,
+#   versus saving version info for subsequent PCK updates
+#   somewhere in , e.g.   user://release_versions/current.txt
 func _current_pck_path():
 	return _HACK_INPUT_PCK_NAME
 func _working_path(release_version):
