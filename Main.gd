@@ -87,6 +87,10 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 				printerr("diff failed checksum verification")
 				return
 			
+			var release_version = _fetching['release_version']
+			if !release_version:
+				printerr("unknown release version: cannot create a new PCK file")
+				return
 			if !patch_status.apply_diff(_current_pck_path(), diff_file_path, _HACK_OUTPUT_PCK_NAME):
 				printerr("Could not apply patch")
 				return
