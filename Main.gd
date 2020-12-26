@@ -1,10 +1,10 @@
 extends Node2D
 
-const _PATCH_NAME = "test-0.0.0_to_test-0.0.0-DELTA.bin"
 const _DELTA_SERVER = "http://127.0.0.1:45819"
 
 var _deltas = []
 var _diffs_to_fetch = []
+var _fetching
 
 func _ready():
 	var app_version = ProjectSettings.get("application/config/version")
@@ -17,19 +17,27 @@ func _ready():
 		metadata_request.request("%s/deltas?from_version=%s" % [_DELTA_SERVER, app_version])
 	
 
-func _fetch_diff(delta: Dictionary):
-	var id = delta['id']
-	var diff_url = delta['diff_url']
-	if id and diff_url:
-		pass
-		var delta_bin_request = get_node_or_null("DeltaBinRequest")
-		if delta_bin_request:
-			delta_bin_request.request(diff_url)
-		print("ok")
-		return true
+enum MoreDiffs { YES, NO, ERR }
+
+func _fetch_next_diff():
+	if _diffs_to_fetch.empty():
+		_fetching = null
+		return MoreDiffs.NO
 	else:
-		printerr("Cannot apply patch: malformed delta response")
-		return false
+		var delta = _diffs_to_fetch.pop_front()
+		_fetching = delta
+		var id = delta['id']
+		var diff_url = delta['diff_url']
+		if id and diff_url:
+			pass
+			var delta_bin_request = get_node_or_null("DeltaBinRequest")
+			if delta_bin_request:
+				delta_bin_request.request(diff_url)
+			print("ok")
+			return MoreDiffs.YES
+		else:
+			printerr("Cannot apply patch: malformed delta response")
+			return MoreDiffs.ERR
 
 func _on_MetadataRequest_request_completed(result, response_code, headers, body):
 	var json = JSON.parse(body.get_string_from_utf8())
@@ -42,17 +50,16 @@ func _on_MetadataRequest_request_completed(result, response_code, headers, body)
 
 
 func _on_DeltaBinRequest_request_completed(result, response_code, headers, body):
-	print("got it")
-	return # for now, don't update
 	if response_code == 200:
+		var patch_name = _fetching['diff_url'].split("/").last()
 		var file = File.new() 
-		file.open(_PATCH_NAME, File.WRITE)
+		file.open(patch_name, File.WRITE)
 		file.store_buffer(body)
 		file.close()
 		
 		var patch_status = get_node_or_null("CenterContainer/VBoxContainer/Patch Status")
 		if patch_status:
-			patch_status.test_patch(_PATCH_NAME)
+			patch_status.test_patch(patch_name)
 			
 			# note this isn't sandbox-safe file naming for godot ...
 			#   ... as the file is opened by rust !!   ... watch out
