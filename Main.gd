@@ -99,7 +99,7 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 				printerr("unknown release version: cannot create a new PCK file")
 				return
 			var output_pck_path = _working_path("%s.pck" % release_version)
-			if !patch_status.apply_diff(_current_pck_path(), diff_file_path, output_pck_path):
+			if !patch_status.apply_diff(_current_pck_path(), _user_path_to_os(diff_file_path), _user_path_to_os(output_pck_path)):
 				printerr("Could not apply patch")
 				return
 	
@@ -108,7 +108,7 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 				printerr("Cannot find checksum for output PCK, aborting")
 				return
 			
-			var pck_chksum_ok = patch_status.verify_checksum(output_pck_path, expected_pck_b2bsum)
+			var pck_chksum_ok = patch_status.verify_checksum(_user_path_to_os(output_pck_path), expected_pck_b2bsum)
 			if pck_chksum_ok:
 				print("validated checksum of output PCK")			
 				_fetch_next_diff()
