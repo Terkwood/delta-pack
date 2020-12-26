@@ -1,7 +1,6 @@
 extends Node2D
 
 const _HACK_INPUT_PCK_NAME = "test-0.0.0.pck"
-const _HACK_OUTPUT_PCK_NAME = "test-0.0.0-DELTA.pck"
 const _RELEASE_VERSIONS_PATH = "user://release_versions"
 
 const _DELTA_SERVER = "http://127.0.0.1:45819"
@@ -34,9 +33,10 @@ func _load_final_pack(pck_file):
 
 func _fetch_next_diff():
 	if _diffs_to_fetch.empty():
+		var final_pck_name = _versioned_pck_path(_fetching)
 		_fetching = null
 		print("All patches applied!")
-		_load_final_pack(_HACK_OUTPUT_PCK_NAME)
+		_load_final_pack(final_pck_name)
 		return
 	else:
 		var delta = _diffs_to_fetch.pop_front()
@@ -95,11 +95,8 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 				return
 			print("Checksum OK: %s" % diff_file_path_last_part)
 			
-			var release_version = _fetching['release_version']
-			if !release_version:
-				printerr("unknown release version: cannot create a new PCK file")
-				return
-			var output_pck_path = _working_path("%s.pck" % release_version)
+			var output_pck_path = _versioned_pck_path(_fetching)
+			
 			if !patch_status.apply_diff(_current_pck_path(), _user_path_to_os(diff_file_path), _user_path_to_os(output_pck_path)):
 				printerr("Could not apply patch")
 				return
@@ -111,7 +108,7 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 			
 			var pck_chksum_ok = patch_status.verify_checksum(_user_path_to_os(output_pck_path), expected_pck_b2bsum)
 			if pck_chksum_ok:
-				print("Checksum OK: v%s PCK" % release_version)
+				print("Checksum OK: v%s PCK" % _fetching['release_version'])
 				_fetch_next_diff()
 			else:
 				printerr("FAILED CHECKSUM !!! ABORT !!!")
@@ -135,6 +132,13 @@ func _current_pck_path():
 	return _HACK_INPUT_PCK_NAME
 func _working_path(release_version):
 	return "%s/%s" % [ _RELEASE_VERSIONS_PATH, release_version ]
+func _versioned_pck_path(delta):
+	var release_version = delta['release_version']
+	if !release_version:
+		printerr("unknown release version: cannot create a new PCK file")
+		return
+	return _working_path("%s.pck" % release_version)
+	
 
 const _USER_PREFIX = "user://"
 func _user_path_to_os(path: String):
