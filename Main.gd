@@ -77,19 +77,6 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 		file.store_buffer(body)
 		file.close()
 		
-		var user_dir = Directory.new()
-		if user_dir.open(_USER_PREFIX) != OK:
-			printerr("Failed to check user space")
-			return
-		user_dir.list_dir_begin()
-		var fn = user_dir.get_next()
-		while fn != "":
-			if user_dir.current_is_dir():
-				print("Found directory: " + fn)
-			else:
-				print("Found file: " + fn)
-			fn = user_dir.get_next()
-		
 		var patch_status = get_node_or_null("CenterContainer/VBoxContainer/Patch Status")
 		if patch_status:
 			var diff_b2bsum = _fetching['diff_b2bsum']
@@ -100,7 +87,7 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 				printerr("diff failed checksum verification")
 				return
 			
-			if !patch_status.apply_diff(_HACK_INPUT_PCK_NAME, diff_file_path, _HACK_OUTPUT_PCK_NAME):
+			if !patch_status.apply_diff(_current_pck_path(), diff_file_path, _HACK_OUTPUT_PCK_NAME):
 				printerr("Could not apply patch")
 				return
 			
