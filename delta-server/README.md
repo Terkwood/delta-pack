@@ -25,6 +25,25 @@ delta-server -d /tmp/delta-data-example  # replace this path
 
 Then you can query this webserver for recent deltas:
 
-```sh
-curl -v http://127.0.0.1:45819/deltas\?from_version=\0.0.0  | jq
+```text
+$ curl http://127.0.0.1:45819/deltas\?from_version=\0.0.0  | jq
+
+[
+  {
+    "id": 2000000,
+    "release_version": "0.1.0",
+    "previous_version": "0.0.0",
+    "diff_url": "https://some/horrible/cloud/myapp-0.0.0_to_0.1.0.diff",
+    "diff_b2bsum": "abc",
+    "expected_pck_b2bsum": "bbb"
+  },
+  {
+    "id": 4000000,
+    "release_version": "0.1.1",
+    "previous_version": "0.1.0",
+    "diff_url": "https://some/horrible/cloud/myapp-0.1.0_to_0.1.1.diff",
+    "diff_b2bsum": "ffe010",
+    "expected_pck_b2bsum": "def012"
+  }
+]
 ```
