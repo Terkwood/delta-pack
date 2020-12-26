@@ -14,6 +14,12 @@ Everything is hardcoded right now, but we are in the process of making the patch
 
 [See the official docs](https://godot-es-docs.readthedocs.io/en/latest/getting_started/workflow/export/exporting_pcks.html) for more information on Godot Engine's support for live-reloading of PCK (game payload) files.
 
+## How to use this demo
+
+To make this system work, your Godot app needs to have a ProjectSetting called "version" configured:
+
+![how to create project setting manually](https://user-images.githubusercontent.com/38859656/103154864-b859dd00-4768-11eb-83f5-ac181c26c32b.png)
+
 
 ## Using bidiff
 
