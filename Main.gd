@@ -1,7 +1,10 @@
 extends Node2D
 
 const _PATCH_NAME = "test-0.0.0_to_test-0.0.0-DELTA.bin"
+const _DELTA_SERVER = "http://127.0.0.1:45819"
 
+var _deltas = []
+var _diffs_to_fetch = []
 
 func _ready():
 	var app_version = ProjectSettings.get("application/config/version")
@@ -11,19 +14,36 @@ func _ready():
 	
 	var metadata_request = get_node_or_null("MetadataRequest")
 	if metadata_request and app_version:
-		metadata_request.request("http://127.0.0.1:45819/deltas?from_version=%s" % app_version)
+		metadata_request.request("%s/deltas?from_version=%s" % [_DELTA_SERVER, app_version])
 	
-	var delta_bin_request = get_node_or_null("DeltaBinRequest")
-	if delta_bin_request:
-		delta_bin_request.request("http://127.0.0.1:8080/%s" % _PATCH_NAME)
 
+func _fetch_diff(delta: Dictionary):
+	var id = delta['id']
+	var diff_url = delta['diff_url']
+	if id and diff_url:
+		pass
+		var delta_bin_request = get_node_or_null("DeltaBinRequest")
+		if delta_bin_request:
+			delta_bin_request.request(diff_url)
+		print("ok")
+		return true
+	else:
+		printerr("Cannot apply patch: malformed delta response")
+		return false
 
 func _on_MetadataRequest_request_completed(result, response_code, headers, body):
 	var json = JSON.parse(body.get_string_from_utf8())
-	print("Delta-server response: %s" % json.result)
+	if typeof(json.result) == TYPE_ARRAY:
+		print("Fetching %d patches" % json.result.size())
+		_deltas = json.result
+		_diffs_to_fetch = json.result
+	else:
+		printerr("Not an array")
 
 
 func _on_DeltaBinRequest_request_completed(result, response_code, headers, body):
+	print("got it")
+	return # for now, don't update
 	if response_code == 200:
 		var file = File.new() 
 		file.open(_PATCH_NAME, File.WRITE)
