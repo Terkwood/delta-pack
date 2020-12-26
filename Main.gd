@@ -77,15 +77,26 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 		file.store_buffer(body)
 		file.close()
 		
+		var user_dir = Directory.new()
+		if user_dir.open(_USER_PREFIX) != OK:
+			printerr("Failed to check user space")
+			return
+		user_dir.list_dir_begin()
+		var fn = user_dir.get_next()
+		while fn != "":
+			if user_dir.current_is_dir():
+				print("Found directory: " + fn)
+			else:
+				print("Found file: " + fn)
+			fn = user_dir.get_next()
+		
 		var patch_status = get_node_or_null("CenterContainer/VBoxContainer/Patch Status")
 		if patch_status:
 			var diff_b2bsum = _fetching['diff_b2bsum']
 			if !diff_b2bsum:
 				printerr("Unknown checksum for diff, aborting")
 				return
-			var rust_ok_path = _user_path_to_os(diff_file_path)
-			print("rust ok path : %s"% rust_ok_path)
-			if !patch_status.verify_checksum(rust_ok_path, diff_b2bsum):
+			if !patch_status.verify_checksum(_user_path_to_os(diff_file_path), diff_b2bsum):
 				printerr("diff failed checksum verification")
 				return
 			
@@ -128,17 +139,8 @@ func _user_path_to_os(path: String):
 	var norm = path.strip_edges().to_lower()
 	var parts = norm.split(_USER_PREFIX)
 	if parts.size() != 2:
+		printerr("unexpected format for user file path")
 		return path
 	var rem = parts[1]
 	
-	var app_name = ProjectSettings.get("application/config/name")
-	match OS.get_name():
-		"Windows":
-			return "%APPDATA%/%s" % app_name
-		"X11":
-			return "~/.local/share/godot/app_userdata/%s" % app_name
-		"OSX":
-			return "~/.local/share/godot/app_userdata/%s" % app_name
-		_:
-			printerr("OS not supported")
-			return null
+	return "%s/%s" % [ OS.get_user_data_dir(), rem ]
