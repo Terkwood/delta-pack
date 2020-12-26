@@ -52,7 +52,15 @@ func _on_MetadataRequest_request_completed(result, response_code, headers, body)
 
 func _on_DeltaBinRequest_request_completed(result, response_code, headers, body):
 	if response_code == 200:
-		var patch_name = _fetching['diff_url'].split("/").last()
+		var diff_url = _fetching['diff_url']
+		if !diff_url:
+			printerr("failed to determine diff URL to save patch")
+			return
+		var su = diff_url.split("/")
+		var patch_name = su[su.size() - 1]
+		if !patch_name:
+			printerr("failed to determine file name to save patch")
+			return
 		var file = File.new() 
 		file.open(patch_name, File.WRITE)
 		file.store_buffer(body)
