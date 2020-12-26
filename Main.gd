@@ -65,12 +65,15 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 			printerr("failed to determine diff URL to save patch")
 			return
 		var su = diff_url.split("/")
-		var diff_file_path = su[su.size() - 1]
-		if !diff_file_path:
+		var diff_file_path_last_part = su[su.size() - 1]
+		if !diff_file_path_last_part:
 			printerr("failed to determine file name to save patch")
 			return
+		var diff_file_path = "%s%s" % [ _USER_PREFIX, diff_file_path_last_part ]
 		var file = File.new()
-		file.open(diff_file_path, File.WRITE)
+		if file.open(diff_file_path, File.WRITE) != OK:
+			printerr("Failed to open diff file for writing")
+			return
 		file.store_buffer(body)
 		file.close()
 		
@@ -80,7 +83,9 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 			if !diff_b2bsum:
 				printerr("Unknown checksum for diff, aborting")
 				return
-			if !patch_status.verify_checksum(diff_file_path, diff_b2bsum):
+			var rust_ok_path = _user_path_to_os(diff_file_path)
+			print("rust ok path : %s"% rust_ok_path)
+			if !patch_status.verify_checksum(rust_ok_path, diff_b2bsum):
 				printerr("diff failed checksum verification")
 				return
 			
@@ -116,7 +121,7 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 func _current_pck_path():
 	return _HACK_INPUT_PCK_NAME
 func _user_pck_path(version):
-	return "user://%s.pck"
+	return "user://deltas/%s.pck"
 
 const _USER_PREFIX = "user://"
 func _user_path_to_os(path: String):
