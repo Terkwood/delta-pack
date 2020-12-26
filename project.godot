@@ -17,3 +17,7 @@ _global_script_class_icons={
 
 config/name="Incremental Patch Demo"
 run/main_scene="res://Main.tscn"
+
+[global]
+
+Version="0.0.0"
