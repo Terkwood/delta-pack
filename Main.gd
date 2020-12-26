@@ -1,5 +1,8 @@
 extends Node2D
 
+const _HACK_INPUT_PCK_NAME = "test-0.0.0.pck"
+const _HACK_OUTPUT_PCK_NAME = "test-0.0.0-DELTA.pck"
+
 const _DELTA_SERVER = "http://127.0.0.1:45819"
 
 var _deltas = []
@@ -68,7 +71,9 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 		
 		var patch_status = get_node_or_null("CenterContainer/VBoxContainer/Patch Status")
 		if patch_status:
-			patch_status.test_patch(patch_name)
+			if !patch_status.apply_patch(_HACK_INPUT_PCK_NAME, patch_name, _HACK_OUTPUT_PCK_NAME):
+				printerr("Could not apply patch")
+				return
 			
 			# note this isn't sandbox-safe file naming for godot ...
 			#   ... as the file is opened by rust !!   ... watch out

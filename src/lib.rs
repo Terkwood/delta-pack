@@ -51,13 +51,17 @@ impl IncrementalPatch {
         input_pck_path: GodotString,
         diff_bin_path: GodotString,
         output_pck_path: GodotString,
-    ) {
-        patch(
+    ) -> bool {
+        if let Err(e) = patch(
             &PathBuf::from_str(&input_pck_path.to_string()).expect("path to input PCK"),
             &PathBuf::from_str(&diff_bin_path.to_string()).expect("path to diff bin"),
             &PathBuf::from_str(&output_pck_path.to_string()).expect("path to output PCK"),
-        )
-        .expect("boom")
+        ) {
+            godot_print!("Error applying patch: {:#?}", e);
+            false
+        } else {
+            true
+        }
     }
 
     #[export]
