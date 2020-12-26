@@ -31,7 +31,7 @@ func _fetch_next_diff():
 	if _diffs_to_fetch.empty():
 		_fetching = null
 		print("Done fetching diffs")
-		_load_final_pack("res://test-0.0.0-DELTA.pck")
+		_load_final_pack(_HACK_OUTPUT_PCK_NAME)
 		return
 	else:
 		var delta = _diffs_to_fetch.pop_front()
