@@ -20,12 +20,19 @@ func _ready():
 		metadata_request.request("%s/deltas?from_version=%s" % [_DELTA_SERVER, app_version])
 	
 
-enum MoreDiffs { YES, NO, ERR }
+func _load_final_pack(pck_file):
+	print("LOADING BRAVE NEW PACK")
+				
+	### TODO!  We shouldn't load until we're done with everything
+	ProjectSettings.load_resource_pack(pck_file)
+	get_tree().change_scene("res://Main.tscn")
 
 func _fetch_next_diff():
 	if _diffs_to_fetch.empty():
 		_fetching = null
-		return MoreDiffs.NO
+		print("Done fetching diffs")
+		_load_final_pack("res://test-0.0.0-DELTA.pck")
+		return
 	else:
 		var delta = _diffs_to_fetch.pop_front()
 		_fetching = delta
@@ -37,10 +44,10 @@ func _fetch_next_diff():
 			if delta_bin_request:
 				delta_bin_request.request(diff_url)
 			print("fetching from %s" % diff_url)
-			return MoreDiffs.YES
+			return
 		else:
 			printerr("Cannot apply patch: malformed delta response")
-			return MoreDiffs.ERR
+			return
 
 func _on_MetadataRequest_request_completed(result, response_code, headers, body):
 	var json = JSON.parse(body.get_string_from_utf8())
@@ -93,11 +100,7 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 			var pck_chksum_ok = patch_status.verify_checksum(_HACK_OUTPUT_PCK_NAME, expected_pck_b2bsum)
 			if pck_chksum_ok:
 				print("validated checksum of output PCK")			
-				print("LOADING BRAVE NEW PACK")
-				
-				### TODO!  We shouldn't load until we're done with everything
-				ProjectSettings.load_resource_pack("res://test-0.0.0-DELTA.pck")
-				get_tree().change_scene("res://Main.tscn")
+				_fetch_next_diff()
 			else:
 				printerr("FAILED CHECKSUM !!! ABORT !!!")
 	
@@ -111,3 +114,4 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 		$CenterContainer/VBoxContainer.add_child(warning_label)
 		$"CenterContainer/VBoxContainer/Patch Status".hide()
 		$CenterContainer/VBoxContainer/TextureRect.hide()
+
