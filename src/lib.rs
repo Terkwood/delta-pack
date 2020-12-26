@@ -16,9 +16,6 @@ use std::{
 #[inherit(Label)]
 struct IncrementalPatch;
 
-const OLD_PCK: &str = "test-0.0.0.pck";
-const OUT_PCK: &str = "test-0.0.0-DELTA.pck";
-
 #[gdnative::methods]
 impl IncrementalPatch {
     fn new(_owner: &Label) -> Self {
@@ -48,13 +45,23 @@ impl IncrementalPatch {
 
     /// Apply a patch, as in https://github.com/divvun/bidiff/blob/1e6571e8f36bba3292b33a4b7dfe4ce93a3abd1e/crates/bic/src/main.rs#L257
     #[export]
-    fn test_patch(&self, _owner: &Label, diff_bin_path: GodotString) {
-        patch(
-            &PathBuf::from_str(OLD_PCK).expect("path to old PCK"),
+    fn apply_patch(
+        &self,
+        _owner: &Label,
+        input_pck_path: GodotString,
+        diff_bin_path: GodotString,
+        output_pck_path: GodotString,
+    ) -> bool {
+        if let Err(e) = patch(
+            &PathBuf::from_str(&input_pck_path.to_string()).expect("path to input PCK"),
             &PathBuf::from_str(&diff_bin_path.to_string()).expect("path to diff bin"),
-            &PathBuf::from_str(OUT_PCK).expect("path to output PCK"),
-        )
-        .expect("boom")
+            &PathBuf::from_str(&output_pck_path.to_string()).expect("path to output PCK"),
+        ) {
+            godot_print!("Error applying patch: {:#?}", e);
+            false
+        } else {
+            true
+        }
     }
 
     #[export]
