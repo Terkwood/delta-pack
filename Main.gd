@@ -4,6 +4,11 @@ const _PATCH_NAME = "test-0.0.0_to_test-0.0.0-DELTA.bin"
 
 
 func _ready():
+	var app_version = ProjectSettings.get("application/config/version")
+	var version_label = get_node_or_null("CenterContainer/VBoxContainer/Version Label")
+	if version_label and app_version:
+		version_label.text = "Running v%s" % app_version
+	
 	var metadata_request = get_node_or_null("MetadataRequest")
 	if metadata_request:
 		metadata_request.request("https://jsonplaceholder.typicode.com/todos/1")
