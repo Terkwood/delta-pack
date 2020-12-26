@@ -2,14 +2,21 @@ extends Node2D
 
 const _HACK_INPUT_PCK_NAME = "test-0.0.0.pck"
 const _HACK_OUTPUT_PCK_NAME = "test-0.0.0-DELTA.pck"
+const _RELEASE_VERSIONS_PATH = "user://release_versions"
 
 const _DELTA_SERVER = "http://127.0.0.1:45819"
+
 
 var _deltas = []
 var _diffs_to_fetch = []
 var _fetching
 
 func _ready():
+	var working_dir = Directory.new()
+	if !working_dir.dir_exists(_RELEASE_VERSIONS_PATH):
+		working_dir.make_dir(_RELEASE_VERSIONS_PATH)
+	
+	# TODO -- probably this doesn't carry over thru reload
 	var app_version = ProjectSettings.get("application/config/version")
 	var version_label = get_node_or_null("CenterContainer/VBoxContainer/Version Label")
 	if version_label and app_version:
@@ -69,7 +76,7 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 		if !diff_file_path_last_part:
 			printerr("failed to determine file name to save patch")
 			return
-		var diff_file_path = "%s%s" % [ _USER_PREFIX, diff_file_path_last_part ]
+		var diff_file_path = _working_path(diff_file_path_last_part)
 		var file = File.new()
 		if file.open(diff_file_path, File.WRITE) != OK:
 			printerr("Failed to open diff file for writing")
@@ -91,18 +98,17 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 			if !release_version:
 				printerr("unknown release version: cannot create a new PCK file")
 				return
-			if !patch_status.apply_diff(_current_pck_path(), diff_file_path, _HACK_OUTPUT_PCK_NAME):
+			var output_pck_path = _working_path("%s.pck" % release_version)
+			if !patch_status.apply_diff(_current_pck_path(), diff_file_path, output_pck_path):
 				printerr("Could not apply patch")
 				return
-			
-			# note this isn't sandbox-safe file naming for godot ...
-			#   ... as the file is opened by rust !!   ... watch out
+	
 			var expected_pck_b2bsum = _fetching['expected_pck_b2bsum']
 			if !expected_pck_b2bsum:
 				printerr("Cannot find checksum for output PCK, aborting")
 				return
 			
-			var pck_chksum_ok = patch_status.verify_checksum(_HACK_OUTPUT_PCK_NAME, expected_pck_b2bsum)
+			var pck_chksum_ok = patch_status.verify_checksum(output_pck_path, expected_pck_b2bsum)
 			if pck_chksum_ok:
 				print("validated checksum of output PCK")			
 				_fetch_next_diff()
@@ -122,8 +128,8 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 
 func _current_pck_path():
 	return _HACK_INPUT_PCK_NAME
-func _user_pck_path(version):
-	return "user://deltas/%s.pck"
+func _working_path(release_version):
+	return "%s/%s" % [ _RELEASE_VERSIONS_PATH, release_version ]
 
 const _USER_PREFIX = "user://"
 func _user_path_to_os(path: String):
@@ -135,3 +141,4 @@ func _user_path_to_os(path: String):
 	var rem = parts[1]
 	
 	return "%s/%s" % [ OS.get_user_data_dir(), rem ]
+
