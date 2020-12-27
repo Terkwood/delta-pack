@@ -38,7 +38,7 @@ func _ready():
 	if !working_dir.dir_exists(_DELTA_PCKS_PATH):
 		working_dir.make_dir_recursive(_DELTA_PCKS_PATH)
 	
-	var app_version = _HARDCODED_VERSION
+	var app_version = _version()
 	var version_label = get_node_or_null("CenterContainer/VBoxContainer/Version Label")
 	if version_label and app_version:
 		version_label.text = "Running v%s" % app_version
@@ -122,7 +122,7 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 				printerr("Could not apply patch")
 				return
 				
-			pass  # TODO update user://delta/version.cfg
+			_write_version_config(_fetching['release_version'])
 	
 			var expected_pck_b2bsum = _fetching['expected_pck_b2bsum']
 			if !expected_pck_b2bsum:
@@ -188,6 +188,21 @@ func _user_path_to_os(path: String):
 	var rem = parts[1]
 	
 	return "%s/%s" % [ OS.get_user_data_dir(), rem ]
+
+func _write_version_config(semver: String):
+	if not semver:
+		printerr("Empty semver")
+		return FAILED
+	else:
+		var cvf = ConfigFile.new()
+		cvf.load(_VERSION_CONFIG_PATH)
+		cvf.set_value(_VERSION_CONFIG_SECTION, _VERSION_CONFIG_KEY, semver)
+		var ret_save = cvf.save(_VERSION_CONFIG_PATH)
+		if ret_save == OK:
+			return OK
+		else:
+			printerr("Could not save version config")
+			return ret_save
 
 func _version():
 	if File.new().file_exists(_VERSION_CONFIG_PATH):
