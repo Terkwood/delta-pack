@@ -11,6 +11,8 @@ var _diffs_to_fetch = []
 var _fetching
 
 func _ready():
+	print("executable path base dir: %s" % OS.get_executable_path().get_base_dir())
+	
 	var working_dir = Directory.new()
 	if !working_dir.dir_exists(_RELEASE_VERSIONS_PATH):
 		working_dir.make_dir(_RELEASE_VERSIONS_PATH)
