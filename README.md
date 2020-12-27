@@ -22,6 +22,9 @@ To make this system work, your Godot app needs to have a ProjectSetting called "
 
 This will be used to query for new versions of your game from the delta (patch metadata) server.  You must use [Semantic Versioning](https://semver.org) formatting, or the delta server will reject your queries.
 
+## Community reference
+
+[This question has been explored a bit on the Godot User Forums](https://godotengine.org/qa/23165/can-we-hot-update-gdscript).  Once the project is more mature, we should post there and assess community interest in the project.
 
 ## Using bidiff
 
