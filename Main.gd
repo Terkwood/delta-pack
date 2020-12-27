@@ -27,8 +27,12 @@ var _fetching
 var _hack_version = _HARDCODED_VERSION
 
 func _ready():
+	pass
+	pass
 	pass # TODO we must figure out whether there is a more recent version
 	pass # TODO     of the game   ... that we should load ... 
+	pass
+	pass
 	
 	var working_dir = Directory.new()
 	if !working_dir.dir_exists(_DELTA_PCKS_PATH):
