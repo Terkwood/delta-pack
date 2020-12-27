@@ -1,7 +1,9 @@
 extends Node2D
 
 const _HACK_INPUT_PCK_NAME = "test-0.0.0.pck"
-const _RELEASE_VERSIONS_PATH = "user://release_versions"
+
+const _RELEASE_VERSIONS_PATH = "user://delta/pcks"
+const _VERSION_CONFIG_PATH = "user://delta/version.cfg"
 
 const _DELTA_SERVER = "http://127.0.0.1:45819"
 
@@ -14,11 +16,9 @@ var _fetching
 var _hack_version = _HARDCODED_VERSION
 
 func _ready():
-	print("executable path base dir: %s" % OS.get_executable_path().get_base_dir())
-	
 	var working_dir = Directory.new()
 	if !working_dir.dir_exists(_RELEASE_VERSIONS_PATH):
-		working_dir.make_dir(_RELEASE_VERSIONS_PATH)
+		working_dir.make_dir_recursive(_RELEASE_VERSIONS_PATH)
 	
 	var app_version = _HARDCODED_VERSION
 	var version_label = get_node_or_null("CenterContainer/VBoxContainer/Version Label")
@@ -48,7 +48,6 @@ func _fetch_next_diff():
 		var id = delta['id']
 		var diff_url = delta['diff_url']
 		if id and diff_url:
-			pass
 			var delta_bin_request = get_node_or_null("DeltaBinRequest")
 			if delta_bin_request:
 				delta_bin_request.request(diff_url)
@@ -133,6 +132,21 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 #   versus saving version info for subsequent PCK updates
 #   somewhere in , e.g.   user://release_versions/current.txt
 func _current_pck_path():
+	pass # What version are we running?
+	pass # Are we running the very first version that the user has ever downloaded??!
+	pass # If so, what version is THAT?
+	pass # ASSUME it's the first version, at the beginning of the release version list:
+	pass #    ... then we need to apply all updates against a PCK file in a strange location
+	pass #    ... 
+	print("executable path base dir: %s" % OS.get_executable_path().get_base_dir())
+	pass #    ... for Mac, this will look like ../Resources/{APPNAME}.pck
+	pass # Next, ASSUME that this is the first time the user has downloaded the game,
+	pass #    ... but that it is NOT the very first version of the game to be released.
+	pass #    ... ... THEN we need to populate the user space with the correct version,
+	pass #    ... ... which can be found in ProjectSettings
+	pass # Finally, ASSUME that the user has previously run the update utility.  Then
+	pass #    ... there should be a loadable ConfigFile in the delta userspace
+	print("Version config file shall reside here: %s" % _VERSION_CONFIG_PATH)
 	return _HACK_INPUT_PCK_NAME
 func _working_path(release_version):
 	return "%s/%s" % [ _RELEASE_VERSIONS_PATH, release_version ]
