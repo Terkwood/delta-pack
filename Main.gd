@@ -111,7 +111,7 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 				print("Checksum OK: v%s PCK" % _fetching['release_version'])
 				_fetch_next_diff()
 			else:
-				printerr("FAILED CHECKSUM !!! ABORT !!!")
+				printerr("Checksum FAILED: v%s PCK. [ -- !!! ABORT !!! -- ]")
 	
 	else:
 		printerr("Bad response to delta bin request: %d" % response_code)
