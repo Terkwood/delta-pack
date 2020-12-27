@@ -2,7 +2,7 @@ extends Node2D
 
 const _HACK_INPUT_PCK_NAME = "test-0.0.0.pck"
 
-const _RELEASE_VERSIONS_PATH = "user://delta/pcks"
+const _DELTA_PCKS_PATH = "user://delta/pcks"
 
 const _VERSION_CONFIG_PATH = "user://delta/version.cfg"
 const _VERSION_CONFIG_SECTION = "release"
@@ -31,8 +31,8 @@ func _ready():
 	pass # TODO     of the game   ... that we should load ... 
 	
 	var working_dir = Directory.new()
-	if !working_dir.dir_exists(_RELEASE_VERSIONS_PATH):
-		working_dir.make_dir_recursive(_RELEASE_VERSIONS_PATH)
+	if !working_dir.dir_exists(_DELTA_PCKS_PATH):
+		working_dir.make_dir_recursive(_DELTA_PCKS_PATH)
 	
 	var app_version = _HARDCODED_VERSION
 	var version_label = get_node_or_null("CenterContainer/VBoxContainer/Version Label")
@@ -117,6 +117,8 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 			if !patch_status.apply_diff(_current_pck_path(), _user_path_to_os(diff_file_path), _user_path_to_os(output_pck_path)):
 				printerr("Could not apply patch")
 				return
+				
+			pass  # TODO update user://delta/version.cfg
 	
 			var expected_pck_b2bsum = _fetching['expected_pck_b2bsum']
 			if !expected_pck_b2bsum:
@@ -163,7 +165,7 @@ func _current_pck_path():
 	print("Version config file shall reside here: %s" % _VERSION_CONFIG_PATH)
 	return _HACK_INPUT_PCK_NAME
 func _working_path(release_version):
-	return "%s/%s" % [ _RELEASE_VERSIONS_PATH, release_version ]
+	return "%s/%s" % [ _DELTA_PCKS_PATH, release_version ]
 func _versioned_pck_path(delta):
 	var release_version = delta['release_version']
 	if !release_version:
