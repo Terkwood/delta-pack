@@ -5,6 +5,7 @@ const _RELEASE_VERSIONS_PATH = "user://release_versions"
 
 const _DELTA_SERVER = "http://127.0.0.1:45819"
 
+const _HARDCODED_VERSION = "0.0.0"
 
 var _deltas = []
 var _diffs_to_fetch = []
@@ -17,8 +18,7 @@ func _ready():
 	if !working_dir.dir_exists(_RELEASE_VERSIONS_PATH):
 		working_dir.make_dir(_RELEASE_VERSIONS_PATH)
 	
-	# TODO -- probably this doesn't carry over thru reload
-	var app_version = ProjectSettings.get("application/config/version")
+	var app_version = _HARDCODED_VERSION
 	var version_label = get_node_or_null("CenterContainer/VBoxContainer/Version Label")
 	if version_label and app_version:
 		version_label.text = "Running v%s" % app_version
