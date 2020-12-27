@@ -16,6 +16,9 @@ var _fetching
 var _hack_version = _HARDCODED_VERSION
 
 func _ready():
+	pass # TODO we must figure out whether there is a more recent version
+	pass # TODO     of the game   ... that we should load ... 
+	
 	var working_dir = Directory.new()
 	if !working_dir.dir_exists(_RELEASE_VERSIONS_PATH):
 		working_dir.make_dir_recursive(_RELEASE_VERSIONS_PATH)
