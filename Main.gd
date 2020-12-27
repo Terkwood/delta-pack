@@ -11,6 +11,8 @@ var _deltas = []
 var _diffs_to_fetch = []
 var _fetching
 
+var _hack_version = _HARDCODED_VERSION
+
 func _ready():
 	print("executable path base dir: %s" % OS.get_executable_path().get_base_dir())
 	
@@ -113,7 +115,7 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 				print("Checksum OK: v%s PCK" % _fetching['release_version'])
 				_fetch_next_diff()
 			else:
-				printerr("Checksum FAILED: v%s PCK. [ -- !!! ABORT !!! -- ]")
+				printerr("Checksum FAILED: v%s PCK. [ -- !!! ABORT !!! -- ]" % _fetching['release_version'])
 	
 	else:
 		printerr("Bad response to delta bin request: %d" % response_code)
