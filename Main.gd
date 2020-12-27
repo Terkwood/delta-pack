@@ -3,7 +3,18 @@ extends Node2D
 const _HACK_INPUT_PCK_NAME = "test-0.0.0.pck"
 
 const _RELEASE_VERSIONS_PATH = "user://delta/pcks"
+
 const _VERSION_CONFIG_PATH = "user://delta/version.cfg"
+const _VERSION_CONFIG_SECTION = "release"
+const _VERSION_CONFIG_KEY = "version"
+
+# TODO DOC
+# TODO DOC
+# TODO DOC
+# TODO DOC
+# TODO DOC
+const _PROJECT_SETTINGS_DELTA_INIT_VERSION = "application/config/delta_init_version"
+
 
 const _DELTA_SERVER = "http://127.0.0.1:45819"
 
@@ -172,3 +183,10 @@ func _user_path_to_os(path: String):
 	
 	return "%s/%s" % [ OS.get_user_data_dir(), rem ]
 
+func _version():
+	if File.new().file_exists(_VERSION_CONFIG_PATH):
+		var cf = ConfigFile.new()
+		cf.load(_VERSION_CONFIG_PATH)
+		return cf.get_value(_VERSION_CONFIG_SECTION, _VERSION_CONFIG_KEY, "0.0.0")
+	else:
+		return ProjectSettings.get(_PROJECT_SETTINGS_DELTA_INIT_VERSION)
