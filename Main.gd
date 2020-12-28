@@ -54,14 +54,19 @@ func _fetch_next_diff():
 			return
 
 func _on_MetadataRequest_request_completed(result, response_code, headers, body):
+	if response_code != HTTPClient.RESPONSE_OK:
+		printerr("Invalid response from delta server")
+		return
 	var json = JSON.parse(body.get_string_from_utf8())
 	if typeof(json.result) == TYPE_ARRAY:
 		print("Fetching %d patches" % json.result.size())
 		_deltas = json.result
 		_diffs_to_fetch = json.result
 		_fetch_next_diff()
+		return
 	else:
-		printerr("Not an array")
+		printerr("Unexpected data from delta server")
+		return
 
 
 func _on_DeltaBinRequest_request_completed(result, response_code, headers, body):
