@@ -133,14 +133,18 @@ func _current_pck_path():
 	print("executable path base dir: %s" % OS.get_executable_path().get_base_dir())
 	match OS.get_name():
 		"OSX":
-			printerr("TODO")
-			return FAILED
+			printerr("Think about editor & dev support: you could expect an ENV variable")
+			pass # ... which would point to a PCK that could stand in as the main pack
+			pass #   ... and this would actually work fine for "standalone" mode when
+			pass #   ...    we are NOT running in a DMG-exported format. 
+			pass # ... but for the normal export flow, we should NOT allow any env override.
+			return ERR_HELP
 		"Windows":
 			printerr("TODO")
-			return FAILED
+			return ERR_HELP
 		"X11":
 			printerr("TODO")
-			return FAILED
+			return ERR_HELP
 		_:
 			return ERR_UNAVAILABLE
 
