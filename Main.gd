@@ -130,8 +130,19 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 
 
 func _current_pck_path():
-	print("executable path base dir: %s" % OS.get_executable_path().get_base_dir()) 
-	return _HACK_INPUT_PCK_NAME
+	print("executable path base dir: %s" % OS.get_executable_path().get_base_dir())
+	match OS.get_name():
+		"OSX":
+			printerr("TODO")
+			return FAILED
+		"Windows":
+			printerr("TODO")
+			return FAILED
+		"X11":
+			printerr("TODO")
+			return FAILED
+		_:
+			return ERR_UNAVAILABLE
 
 func _working_path(release_version):
 	return "%s/%s" % [ _DELTA_PCKS_PATH, release_version ]
