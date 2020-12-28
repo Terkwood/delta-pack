@@ -4,7 +4,7 @@ onready var VERSION = preload("res://version.gd").new().version
 
 const _HACK_INPUT_PCK_NAME = "test-0.0.0.pck"
 
-const _DELTA_PCKS_PATH = "user://delta/pcks"
+const _DELTA_PCKS_PATH = "user://delta"
 
 const _DELTA_SERVER = "http://127.0.0.1:45819"
 
@@ -13,13 +13,6 @@ var _diffs_to_fetch = []
 var _fetching
 
 func _ready():
-	pass
-	pass
-	pass # TODO we must figure out whether there is a more recent version
-	pass # TODO     of the game   ... that we should load ... 
-	pass
-	pass
-	
 	var working_dir = Directory.new()
 	if !working_dir.dir_exists(_DELTA_PCKS_PATH):
 		working_dir.make_dir_recursive(_DELTA_PCKS_PATH)
@@ -130,15 +123,14 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 		$"CenterContainer/VBoxContainer/Patch Status".hide()
 		$CenterContainer/VBoxContainer/TextureRect.hide()
 
-# Placeholder: we need some way to bootstrap figuring
-#   out the initial PCK based on the app name,
-#   versus saving version info for subsequent PCK updates
-#   somewhere in , e.g.   user://release_versions/current.txt
+
 func _current_pck_path():
 	print("executable path base dir: %s" % OS.get_executable_path().get_base_dir()) 
 	return _HACK_INPUT_PCK_NAME
+
 func _working_path(release_version):
 	return "%s/%s" % [ _DELTA_PCKS_PATH, release_version ]
+
 func _versioned_pck_path(delta):
 	var release_version = delta['release_version']
 	if !release_version:
