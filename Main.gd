@@ -1,30 +1,16 @@
 extends Node2D
 
+onready var VERSION = preload("res://version.gd").new().version
+
 const _HACK_INPUT_PCK_NAME = "test-0.0.0.pck"
 
 const _DELTA_PCKS_PATH = "user://delta/pcks"
 
-const _VERSION_CONFIG_PATH = "user://delta/version.cfg"
-const _VERSION_CONFIG_SECTION = "release"
-const _VERSION_CONFIG_KEY = "version"
-
-# TODO DOC
-# TODO DOC
-# TODO DOC
-# TODO DOC
-# TODO DOC
-const _PROJECT_SETTINGS_DELTA_INIT_VERSION = "application/config/delta_init_version"
-
-
 const _DELTA_SERVER = "http://127.0.0.1:45819"
-
-const _HARDCODED_VERSION = "0.0.0"
 
 var _deltas = []
 var _diffs_to_fetch = []
 var _fetching
-
-var _hack_version = _HARDCODED_VERSION
 
 func _ready():
 	pass
@@ -38,14 +24,13 @@ func _ready():
 	if !working_dir.dir_exists(_DELTA_PCKS_PATH):
 		working_dir.make_dir_recursive(_DELTA_PCKS_PATH)
 	
-	var app_version = _version()
 	var version_label = get_node_or_null("CenterContainer/VBoxContainer/Version Label")
-	if version_label and app_version:
-		version_label.text = "Running v%s" % app_version
+	if version_label and VERSION:
+		version_label.text = "Running v%s" % VERSION
 	
 	var metadata_request = get_node_or_null("MetadataRequest")
-	if metadata_request and app_version:
-		metadata_request.request("%s/deltas?from_version=%s" % [_DELTA_SERVER, app_version])
+	if metadata_request and VERSION:
+		metadata_request.request("%s/deltas?from_version=%s" % [_DELTA_SERVER, VERSION])
 	
 
 func _load_final_pack(pck_file):
@@ -121,8 +106,6 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 			if !patch_status.apply_diff(_current_pck_path(), _user_path_to_os(diff_file_path), _user_path_to_os(output_pck_path)):
 				printerr("Could not apply patch")
 				return
-				
-			_write_version_config(_fetching['release_version'])
 	
 			var expected_pck_b2bsum = _fetching['expected_pck_b2bsum']
 			if !expected_pck_b2bsum:
@@ -152,21 +135,7 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 #   versus saving version info for subsequent PCK updates
 #   somewhere in , e.g.   user://release_versions/current.txt
 func _current_pck_path():
-	pass # What version are we running?
-	pass # Are we running the very first version that the user has ever downloaded??!
-	pass # If so, what version is THAT?
-	pass # ASSUME it's the first version, at the beginning of the release version list:
-	pass #    ... then we need to apply all updates against a PCK file in a strange location
-	pass #    ... 
-	print("executable path base dir: %s" % OS.get_executable_path().get_base_dir())
-	pass #    ... for Mac, this will look like ../Resources/{APPNAME}.pck
-	pass # Next, ASSUME that this is the first time the user has downloaded the game,
-	pass #    ... but that it is NOT the very first version of the game to be released.
-	pass #    ... ... THEN we need to populate the user space with the correct version,
-	pass #    ... ... which can be found in ProjectSettings
-	pass # Finally, ASSUME that the user has previously run the update utility.  Then
-	pass #    ... there should be a loadable ConfigFile in the delta userspace
-	print("Version config file shall reside here: %s" % _VERSION_CONFIG_PATH)
+	print("executable path base dir: %s" % OS.get_executable_path().get_base_dir()) 
 	return _HACK_INPUT_PCK_NAME
 func _working_path(release_version):
 	return "%s/%s" % [ _DELTA_PCKS_PATH, release_version ]
@@ -188,26 +157,3 @@ func _user_path_to_os(path: String):
 	var rem = parts[1]
 	
 	return "%s/%s" % [ OS.get_user_data_dir(), rem ]
-
-func _write_version_config(semver: String):
-	if not semver:
-		printerr("Empty semver")
-		return FAILED
-	else:
-		var cvf = ConfigFile.new()
-		cvf.load(_VERSION_CONFIG_PATH)
-		cvf.set_value(_VERSION_CONFIG_SECTION, _VERSION_CONFIG_KEY, semver)
-		var ret_save = cvf.save(_VERSION_CONFIG_PATH)
-		if ret_save == OK:
-			return OK
-		else:
-			printerr("Could not save version config")
-			return ret_save
-
-func _version():
-	if File.new().file_exists(_VERSION_CONFIG_PATH):
-		var cf = ConfigFile.new()
-		cf.load(_VERSION_CONFIG_PATH)
-		return cf.get_value(_VERSION_CONFIG_SECTION, _VERSION_CONFIG_KEY, "0.0.0")
-	else:
-		return ProjectSettings.get(_PROJECT_SETTINGS_DELTA_INIT_VERSION)
