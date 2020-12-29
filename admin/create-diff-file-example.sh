@@ -7,9 +7,11 @@ NEW_SIZE=$(stat -c%s "$NEW_PACK")
 
 NUM_THREADS=8
 SORT_PARTITIONS="$(($NUM_THREADS - 1))"
-SCAN_CHUNK_SIZE="$(( $NEW_SIZE / ($NUM_THREADS * 3) ))"
+MAGIC="$(($NUM_THREADS * 3))"
+SCAN_CHUNK_SIZE_FIRST_PASS=$(( NEW_SIZE / MAGIC ))
+SCAN_CHUNK_SIZE=$(( SCAN_CHUNK_SIZE > 0 ? SCAN_CHUNK_SIZE : 1 ))
 
 echo "SORT_PARTITIONS $SORT_PARTITIONS"
 echo "SCAN_CHUNK_SIZE $SCAN_CHUNK_SIZE"
 
-bic diff $OLD_PACK $NEW_PACK $DIFF_OUT --method zstd --sort-partitions $SORT_PARTITIONS --scan-chunk-size $SCAN_CHUNK_SIZE --method zstd
+bic diff $OLD_PACK $NEW_PACK $DIFF_OUT --method zstd --sort-partitions $SORT_PARTITIONS --scan-chunk-size $SCAN_CHUNK_SIZE
