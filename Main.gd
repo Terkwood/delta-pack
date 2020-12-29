@@ -2,11 +2,10 @@ extends Node2D
 
 onready var VERSION = preload("res://version.gd").new().version
 
-const _HACK_INPUT_PCK_NAME = "test-0.0.0.pck"
-
 const _DELTA_PCKS_PATH = "user://delta"
-
 const _DELTA_SERVER = "http://127.0.0.1:45819"
+const _MAC_SYSTEM_INSTALL_DIR = "/Applications/Godot.app/Contents/MacOS"
+const _USER_FILES_PREFIX = "user://"
 
 var _deltas = []
 var _diffs_to_fetch = []
@@ -128,19 +127,6 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 		$"CenterContainer/VBoxContainer/Patch Status".hide()
 		$CenterContainer/VBoxContainer/TextureRect.hide()
 
-####
-#### DEV SUPPORT FUNCTIONS
-####
-# this is only used to support running from the editor, or
-# from manually invoking a godot executable that was not
-# distributed as part of the export process
-func _main_pack_env_arg():
-	return OS.get_environment("MAIN_PACK")
-# TODO add branches for X11, Windows
-const _MAC_SYSTEM_INSTALL_DIR = "/Applications/Godot.app/Contents/MacOS"
-func _is_systemwide_install(exec_dir: String):
-	return exec_dir == _MAC_SYSTEM_INSTALL_DIR and _main_pack_env_arg()
-
 func _mac_pck_path(exec_dir: String):
 	var pf = File.new()
 	var split_exec_dir = exec_dir.split("/")
@@ -179,10 +165,22 @@ func _current_pck_path():
 		_:
 			return ERR_UNAVAILABLE
 
-func _working_path(release_version):
+####
+#### DEV SUPPORT FUNCTIONS
+####
+# this is only used to support running from the editor, or
+# from manually invoking a godot executable that was not
+# distributed as part of the export process
+func _main_pack_env_arg():
+	return OS.get_environment("MAIN_PACK")
+# TODO add branches for X11, Windows
+func _is_systemwide_install(exec_dir: String):
+	return exec_dir == _MAC_SYSTEM_INSTALL_DIR and _main_pack_env_arg()
+
+func _working_path(release_version: String):
 	return "%s/%s" % [ _DELTA_PCKS_PATH, release_version ]
 
-func _versioned_pck_path(delta):
+func _versioned_pck_path(delta: Dictionary):
 	var release_version = delta['release_version']
 	if !release_version:
 		printerr("unknown release version: cannot create a new PCK file")
@@ -190,10 +188,9 @@ func _versioned_pck_path(delta):
 	return _working_path("%s.pck" % release_version)
 	
 
-const _USER_PREFIX = "user://"
 func _user_path_to_os(path: String):
 	var norm = path.strip_edges().to_lower()
-	var parts = norm.split(_USER_PREFIX)
+	var parts = norm.split(_USER_FILES_PREFIX)
 	if parts.size() != 2:
 		printerr("unexpected format for user file path")
 		return path
