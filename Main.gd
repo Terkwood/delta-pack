@@ -35,6 +35,7 @@ func _load_final_pack(pck_file):
 		# because we want the next call to _version() to return
 		# the most recent value, even if we haven't restarted
 		# the app!
+		# THANKS https://godotlearn.com/godot-3-1-how-to-destroy-object-node/
 		var main_scene = get_tree().get_current_scene()
 		root.remove_child(main_scene)
 		main_scene.call_deferred("free")
