@@ -32,7 +32,7 @@ func _load_final_pack(pck_file):
 
 func _fetch_next_diff():
 	if _diffs_to_fetch.empty():
-		var final_pck_name = _versioned_pck_path(_fetching)
+		var final_pck_name = _intermediate_pck_path(_fetching)
 		_fetching = null
 		print("All patches applied!")
 		_load_final_pack(final_pck_name)
@@ -79,7 +79,7 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 		if !diff_file_path_last_part:
 			printerr("failed to determine file name to save patch")
 			return
-		var diff_file_path = _working_path(diff_file_path_last_part)
+		var diff_file_path = _workdir_path(diff_file_path_last_part)
 		var file = File.new()
 		if file.open(diff_file_path, File.WRITE) != OK:
 			printerr("Failed to open diff file for writing")
@@ -98,7 +98,7 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 				return
 			print("Checksum OK: %s" % diff_file_path_last_part)
 			
-			var output_pck_path = _versioned_pck_path(_fetching)
+			var output_pck_path = _intermediate_pck_path(_fetching)
 			
 			if !patch_status.apply_diff(_current_pck_path(), _user_path_to_os(diff_file_path), _user_path_to_os(output_pck_path)):
 				printerr("Could not apply patch")
@@ -177,15 +177,16 @@ func _main_pack_env_arg():
 func _is_systemwide_install(exec_dir: String):
 	return exec_dir == _MAC_SYSTEM_INSTALL_DIR and _main_pack_env_arg()
 
-func _working_path(release_version: String):
-	return "%s/%s" % [ _DELTA_PCKS_PATH, release_version ]
+# path to a an intermediate PCK
+func _workdir_path(filename: String):
+	return "%s/%s" % [ _DELTA_PCKS_PATH, filename ]
 
-func _versioned_pck_path(delta: Dictionary):
+func _intermediate_pck_path(delta: Dictionary):
 	var release_version = delta['release_version']
 	if !release_version:
 		printerr("unknown release version: cannot create a new PCK file")
 		return
-	return _working_path("%s.pck" % release_version)
+	return _workdir_path("%s.pck" % release_version)
 	
 
 func _user_path_to_os(path: String):
