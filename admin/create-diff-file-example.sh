@@ -1,2 +1,15 @@
 #!/bin/bash
-bic diff test-0.0.0-DELTA.pck test-0.1.0.pck mock-patch-server/test-0.0.0-DELTA_to_test-0.1.0.bin --method zstd
+
+OLD_PACK="beta-0.0.0.pck"
+NEW_PACK="beta-0.0.1.pck"
+DIFF_OUT="beta-0.0.0.pck_to_beta.0.0.1.pck.diff"
+NEW_SIZE=$(stat -c%s "$NEW_PACK")
+
+NUM_THREADS=8
+SORT_PARTITIONS="$(($NUM_THREADS - 1))"
+SCAN_CHUNK_SIZE="$(( $NEW_SIZE / ($NUM_THREADS * 3) ))"
+
+echo "SORT_PARTITIONS $SORT_PARTITIONS"
+echo "SCAN_CHUNK_SIZE $SCAN_CHUNK_SIZE"
+
+bic diff $OLD_PACK $NEW_PACK $DIFF_OUT --method zstd --sort-partitions $SORT_PARTITIONS --scan-chunk-size $SCAN_CHUNK_SIZE --method zstd
