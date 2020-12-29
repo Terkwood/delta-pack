@@ -3,6 +3,7 @@
 OLD_PACK="beta-0.0.0.pck"
 NEW_PACK="beta-0.0.1.pck"
 DIFF_OUT="beta-0.0.0.pck_to_beta.0.0.1.pck.diff"
+# size of the newer file, in bytes
 NEW_SIZE=`du -k "$NEW_PACK" | cut -f1`
 
 NUM_THREADS=8
