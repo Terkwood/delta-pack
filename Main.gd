@@ -1,8 +1,5 @@
 extends Node2D
 
-func _version():
-	return "0.0.2"
-
 const _DELTA_PCKS_PATH = "user://delta"
 const _DELTA_SERVER = "http://127.0.0.1:45819"
 const _MAC_SYSTEM_INSTALL_DIR = "/Applications/Godot.app/Contents/MacOS"
@@ -13,18 +10,20 @@ var _diffs_to_fetch = []
 var _fetching
 var _last_intermediate_pck = _primary_pck_path()
 
+onready var _version = $Version.value
+
 func _ready():
 	var working_dir = Directory.new()
 	if !working_dir.dir_exists(_DELTA_PCKS_PATH):
 		working_dir.make_dir_recursive(_DELTA_PCKS_PATH)
 	
 	var version_label = get_node_or_null("CenterContainer/VBoxContainer/Version Label")
-	if version_label and _version():
-		version_label.text = "Running v%s" % _version()
+	if version_label and _version:
+		version_label.text = "Running v%s" % _version
 	
 	var metadata_request = get_node_or_null("MetadataRequest")
-	if metadata_request and _version():
-		metadata_request.request("%s/deltas?from_version=%s" % [ _DELTA_SERVER, _version() ])
+	if metadata_request and _version:
+		metadata_request.request("%s/deltas?from_version=%s" % [ _DELTA_SERVER, _version ])
 	
 
 func _load_final_pack(pck_file):
@@ -39,8 +38,9 @@ func _load_final_pack(pck_file):
 		var main_scene = get_tree().get_current_scene()
 		root.remove_child(main_scene)
 		main_scene.call_deferred("free")
-		# OK, go ahead and refresh the scene.
-		# We should see the most up-to-date version show immediately!
+		
+		# Try to refresh the scene:  sprites will update
+		#    but the _version() function will not!
 		var refreshed_main_scene = load("res://Main.tscn").instance()
 		root.add_child(refreshed_main_scene)
 	else:
