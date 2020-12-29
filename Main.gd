@@ -128,17 +128,48 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 		$"CenterContainer/VBoxContainer/Patch Status".hide()
 		$CenterContainer/VBoxContainer/TextureRect.hide()
 
+####
+#### DEV SUPPORT FUNCTIONS
+####
+# this is only used to support running from the editor, or
+# from manually invoking a godot executable that was not
+# distributed as part of the export process
+func _main_pack_env_arg():
+	return OS.get_environment("MAIN_PACK")
+# TODO add branches for X11, Windows
+const _MAC_SYSTEM_INSTALL_DIR = "/Applications/Godot.app/Contents/MacOS"
+func _is_systemwide_install(exec_dir: String):
+	return exec_dir == _MAC_SYSTEM_INSTALL_DIR and _main_pack_env_arg()
+
+func _mac_pck_path(exec_dir: String):
+	var pf = File.new()
+	var split_exec_dir = exec_dir.split("/")
+	var main_pack = ""
+	for i in range(0, split_exec_dir.size() - 1):
+		main_pack += "/%s" % split_exec_dir[i]
+	main_pack += "/Resources/%s.pck" % ProjectSettings.get("application/config/name")
+	main_pack = main_pack.substr(1)
+	if !pf.file_exists(main_pack):
+		return ERR_FILE_NOT_FOUND
+	else:
+		return main_pack
+
 
 func _current_pck_path():
-	print("executable path base dir: %s" % OS.get_executable_path().get_base_dir())
+	if OS.has_feature("editor") and _main_pack_env_arg():
+		# try to use a path passed as $MAIN_PACK environment variable.
+		# this isn't realistic, but it might be useful for testing
+		return _main_pack_env_arg()
+
+	var exec_dir = OS.get_executable_path().get_base_dir()
+	print("executable path base dir: %s" % exec_dir)
 	match OS.get_name():
 		"OSX":
-			printerr("Think about editor & dev support: you could expect an ENV variable")
-			pass # ... which would point to a PCK that could stand in as the main pack
-			pass #   ... and this would actually work fine for "standalone" mode when
-			pass #   ...    we are NOT running in a DMG-exported format. 
-			pass # ... but for the normal export flow, we should NOT allow any env override.
-			return ERR_HELP
+			if _is_systemwide_install(exec_dir):
+				# This is only for dev support.  Standard export flow
+				# does not fall in to this case
+				return _main_pack_env_arg()
+			return _mac_pck_path(exec_dir)
 		"Windows":
 			printerr("TODO")
 			return ERR_HELP
