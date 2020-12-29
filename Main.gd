@@ -1,6 +1,7 @@
 extends Node2D
 
-onready var VERSION = preload("res://version.gd").new().version
+func _version():
+	return "0.0.2"
 
 const _DELTA_PCKS_PATH = "user://delta"
 const _DELTA_SERVER = "http://127.0.0.1:45819"
@@ -10,6 +11,7 @@ const _USER_FILES_PREFIX = "user://"
 var _deltas = []
 var _diffs_to_fetch = []
 var _fetching
+var _last_intermediate_pck = _primary_pck_path()
 
 func _ready():
 	var working_dir = Directory.new()
@@ -17,27 +19,39 @@ func _ready():
 		working_dir.make_dir_recursive(_DELTA_PCKS_PATH)
 	
 	var version_label = get_node_or_null("CenterContainer/VBoxContainer/Version Label")
-	if version_label and VERSION:
-		version_label.text = "Running v%s" % VERSION
+	if version_label and _version():
+		version_label.text = "Running v%s" % _version()
 	
 	var metadata_request = get_node_or_null("MetadataRequest")
-	if metadata_request and VERSION:
-		metadata_request.request("%s/deltas?from_version=%s" % [_DELTA_SERVER, VERSION])
+	if metadata_request and _version():
+		metadata_request.request("%s/deltas?from_version=%s" % [ _DELTA_SERVER, _version() ])
 	
 
 func _load_final_pack(pck_file):
-	print("LOADING BRAVE NEW PACK")
-	ProjectSettings.load_resource_pack(pck_file)
-	get_tree().change_scene("res://Main.tscn")
+	if ProjectSettings.load_resource_pack(pck_file):
+		print("LOADED BRAVE NEW PACK")
+		get_tree().change_scene("res://Main.tscn")
+	else:
+		printerr("!!! ... Oh No.  Failed To Load Resource Pack ... !!!")
 
 func _fetch_next_diff():
 	if _diffs_to_fetch.empty():
 		var final_pck_name = _intermediate_pck_path(_fetching)
 		_fetching = null
 		print("All patches applied!")
-		_load_final_pack(final_pck_name)
-		return
+		var dd = Directory.new()
+		var ppp = _primary_pck_path()
+		if dd.copy(final_pck_name, ppp) == OK:
+			_load_final_pack(ppp)
+			return
+		else:
+			printerr("FINAL COPY FAILED!")
+			return
 	else:
+		if _fetching:
+			# We just finished fetching, but hold on to the output PCK path
+			# so that we can apply the next diff to it
+			_last_intermediate_pck = _user_path_to_os(_intermediate_pck_path(_fetching))
 		var delta = _diffs_to_fetch.pop_front()
 		_fetching = delta
 		var id = delta['id']
@@ -100,7 +114,14 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 			
 			var output_pck_path = _intermediate_pck_path(_fetching)
 			
-			if !patch_status.apply_diff(_current_pck_path(), _user_path_to_os(diff_file_path), _user_path_to_os(output_pck_path)):
+			var ipp = _last_intermediate_pck
+			var dfp = _user_path_to_os(diff_file_path)
+			var opp = _user_path_to_os(output_pck_path)
+			print("apply diff to:")
+			print("\t%s" % ipp)
+			print("\t%s" % dfp)
+			print("\t%s" % opp)
+			if !patch_status.apply_diff(ipp, dfp, opp):
 				printerr("Could not apply patch")
 				return
 	
@@ -141,14 +162,13 @@ func _mac_pck_path(exec_dir: String):
 		return main_pack
 
 
-func _current_pck_path():
+func _primary_pck_path():
 	if OS.has_feature("editor") and _main_pack_env_arg():
 		# try to use a path passed as $MAIN_PACK environment variable.
 		# this isn't realistic, but it might be useful for testing
 		return _main_pack_env_arg()
 
 	var exec_dir = OS.get_executable_path().get_base_dir()
-	print("executable path base dir: %s" % exec_dir)
 	match OS.get_name():
 		"OSX":
 			if _is_systemwide_install(exec_dir):
