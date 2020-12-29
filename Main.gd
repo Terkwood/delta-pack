@@ -30,6 +30,15 @@ func _ready():
 func _load_final_pack(pck_file):
 	if ProjectSettings.load_resource_pack(pck_file):
 		print("LOADED BRAVE NEW PACK")
+		var root = get_tree().get_root()
+		# Be really sure we remove the current scene,
+		# because we want the next call to _version() to return
+		# the most recent value, even if we haven't restarted
+		# the app!
+		var main_scene = get_tree().get_current_scene()
+		root.remove_child(main_scene)
+		main_scene.call_deferred("free")
+		# OK, go ahead and refresh the scene
 		get_tree().change_scene("res://Main.tscn")
 	else:
 		printerr("!!! ... Oh No.  Failed To Load Resource Pack ... !!!")
