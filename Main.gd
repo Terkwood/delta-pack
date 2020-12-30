@@ -1,6 +1,6 @@
 extends Node2D
 
-const _DELTA_PCKS_PATH = "user://delta"
+const _DOWNLOAD_WORKDIR = "user://delta"
 const _DELTA_SERVER = "http://127.0.0.1:45819"
 const _MAC_SYSTEM_INSTALL_DIR = "/Applications/Godot.app/Contents/MacOS"
 const _USER_FILES_PREFIX = "user://"
@@ -14,8 +14,8 @@ onready var _version = $Version.value
 
 func _ready():
 	var working_dir = Directory.new()
-	if !working_dir.dir_exists(_DELTA_PCKS_PATH):
-		working_dir.make_dir_recursive(_DELTA_PCKS_PATH)
+	if !working_dir.dir_exists(_DOWNLOAD_WORKDIR):
+		working_dir.make_dir_recursive(_DOWNLOAD_WORKDIR)
 	
 	var version_label = get_node_or_null("CenterContainer/VBoxContainer/Version Label")
 	if version_label and _version:
@@ -54,6 +54,7 @@ func _fetch_next_diff():
 		var dd = Directory.new()
 		var ppp = _primary_pck_path()
 		if dd.copy(final_pck_name, ppp) == OK:
+			_clean_up_workdir()
 			_load_final_pack(ppp)
 			return
 		else:
@@ -211,7 +212,7 @@ func _is_systemwide_install(exec_dir: String):
 
 # path to a an intermediate PCK
 func _workdir_path(filename: String):
-	return "%s/%s" % [ _DELTA_PCKS_PATH, filename ]
+	return "%s/%s" % [ _DOWNLOAD_WORKDIR, filename ]
 
 func _intermediate_pck_path(delta: Dictionary):
 	var release_version = delta['release_version']
@@ -230,3 +231,17 @@ func _user_path_to_os(path: String):
 	var rem = parts[1]
 	
 	return "%s/%s" % [ OS.get_user_data_dir(), rem ]
+
+func _clean_up_workdir():
+	var dir = Directory.new()
+	if dir.open(_DOWNLOAD_WORKDIR) == OK:
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		while file_name != "":
+			if !dir.current_is_dir():
+				if dir.remove(file_name) != OK:
+					printerr("Could not clean up file: %s" % file_name)
+			file_name = dir.get_next()
+	else:
+		printerr("Could not open %s for cleanup" % _DOWNLOAD_WORKDIR)
+
