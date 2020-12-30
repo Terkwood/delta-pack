@@ -1,11 +1,15 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://icon.png" type="Texture" id=1]
 [ext_resource path="res://Main.gd" type="Script" id=2]
 [ext_resource path="res://Patch Status.gdns" type="Script" id=3]
+[ext_resource path="res://Version.tscn" type="PackedScene" id=4]
 
 [node name="Main" type="Node2D"]
 script = ExtResource( 2 )
+
+[node name="Version" parent="." instance=ExtResource( 4 )]
+value = "0.0.2"
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 anchor_right = 1.0
@@ -17,26 +21,48 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
-margin_left = 87.0
+margin_left = 27.0
 margin_top = 25.0
-margin_right = 167.0
+margin_right = 227.0
 margin_bottom = 125.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Version Label" type="Label" parent="CenterContainer/VBoxContainer"]
-margin_right = 80.0
+margin_right = 200.0
 margin_bottom = 14.0
 text = "version here"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
 margin_top = 18.0
-margin_right = 80.0
+margin_right = 200.0
 margin_bottom = 82.0
+
+[node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer"]
+margin_right = 64.0
+margin_bottom = 64.0
+texture = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect2" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 68.0
+margin_right = 132.0
+margin_bottom = 64.0
+texture = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect3" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 136.0
+margin_right = 200.0
+margin_bottom = 64.0
 texture = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -44,7 +70,7 @@ __meta__ = {
 
 [node name="Patch Status" type="Label" parent="CenterContainer/VBoxContainer"]
 margin_top = 86.0
-margin_right = 80.0
+margin_right = 200.0
 margin_bottom = 100.0
 script = ExtResource( 3 )
 

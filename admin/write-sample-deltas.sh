@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DATA_DIR=/tmp/delta-sample-0123
+DATA_DIR=/tmp/delta-sample-beta
 
 if [ -d "$DATA_DIR" ]; then
     echo "Cannot proceed if the dir $DATA_DIR exists!"
@@ -14,4 +14,7 @@ write-delta --data-dir $DATA_DIR -r 0.0.0 -p 0.0.0 --diff-url "http://localhost:
 
 
 # first update
-write-delta --data-dir $DATA_DIR -r 0.1.0 -p 0.0.0 --diff-url "http://localhost:8080/test-0.0.0_to_test-0.0.0-DELTA.bin" --diff-b2bsum 3de46aeb3a11efb998af4a7c1bcdf54d1a397df9d31883162942ac5cbab04dba1e7f8dc451d6b621ae80e4220c1767d9533795d4afc0b0cfffd7017f72e1f3cc --expected-pck-b2bsum 80417e1017a3be2e153fd5e8fbf342d30861a14ae15488c3cf1a850fac98e3c1f5a2e6c2262ce1bb70c3cd23c9a1a01fa8ba24fab9d24138849e81bdc8eebd49
+write-delta --data-dir $DATA_DIR -r 0.0.1 -p 0.0.0 --diff-url "http://localhost:8080/beta-0.0.0.pck_to_beta-0.0.1.pck.diff" --diff-b2bsum `cat beta-0.0.0.pck_to_beta-0.0.1.pck.diff.b2bsum` --expected-pck-b2bsum  `cat beta-0.0.1.pck.b2bsum`
+
+# second update
+write-delta --data-dir $DATA_DIR -r 0.0.2 -p 0.0.1 --diff-url "http://localhost:8080/beta-0.0.1.pck_to_beta-0.0.2.pck.diff" --diff-b2bsum `cat beta-0.0.1.pck_to_beta-0.0.2.pck.diff.b2bsum` -e `cat beta-0.0.2.pck.b2bsum`
