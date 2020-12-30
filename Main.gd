@@ -4,13 +4,14 @@ const _DOWNLOAD_WORKDIR = "user://delta"
 const _DELTA_SERVER = "http://127.0.0.1:45819"
 const _MAC_SYSTEM_INSTALL_DIR = "/Applications/Godot.app/Contents/MacOS"
 const _USER_FILES_PREFIX = "user://"
+const _RELEASE_RESOURCE_PATH = "res://release.tres"
 
 var _deltas = []
 var _diffs_to_fetch = []
 var _fetching
 var _last_intermediate_pck = _primary_pck_path()
 
-onready var _version = $Version.value
+onready var _version = load(_RELEASE_RESOURCE_PATH).version
 
 func _ready():
 	var working_dir = Directory.new()
@@ -38,6 +39,11 @@ func _load_final_pack(pck_file):
 		var main_scene = get_tree().get_current_scene()
 		root.remove_child(main_scene)
 		main_scene.call_deferred("free")
+		
+		# Make sure this script, and the release version resource,
+		# are both refreshed
+		ResourceLoader.load("res://Main.gd", "", true).take_over_path("res://Main.gd")
+		ResourceLoader.load(_RELEASE_RESOURCE_PATH, "", true).take_over_path(_RELEASE_RESOURCE_PATH)
 		
 		# Try to refresh the scene:  sprites will update
 		#    but the _version() function will not!
