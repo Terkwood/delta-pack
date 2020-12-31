@@ -1,13 +1,10 @@
-# Test example
-test-0.0.0-DELTA.pck
-
 # Export dir
-export/
+**/export/
 # Rust binaries
-target/
+**/target/
 
 # Godot-specific ignores
-.import/
+**/.import/
 export.cfg
 export_presets.cfg
 
@@ -21,6 +18,4 @@ data_*/
 
 
 # Added by cargo
-
-/target
 Cargo.lock

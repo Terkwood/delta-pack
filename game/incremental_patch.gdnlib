@@ -1,0 +1,18 @@
+[general]
+
+singleton=false
+load_once=false
+symbol_prefix="godot_"
+reloadable=true
+
+[entry]
+
+OSX.64="res://libincremental_patch.dylib"
+Windows.64="res://incremental_patch.dll"
+X11.64="res://libincremental_patch.so"
+
+[dependencies]
+
+OSX.64=[  ]
+Windows.64=[  ]
+X11.64=[  ]
