@@ -45,8 +45,6 @@ func _load_final_pack(pck_file):
 		ResourceLoader.load("res://Main.gd", "", true).take_over_path("res://Main.gd")
 		ResourceLoader.load(_RELEASE_RESOURCE_PATH, "", true).take_over_path(_RELEASE_RESOURCE_PATH)
 		
-		# Try to refresh the scene:  sprites will update
-		#    but the _version() function will not!
 		var refreshed_main_scene = load("res://Main.tscn").instance()
 		root.add_child(refreshed_main_scene)
 	else:
