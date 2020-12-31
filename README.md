@@ -2,13 +2,13 @@
 
 🏗 _THIS PROJECT IS STILL UNDER CONSTRUCTION!_ 🏗
 
-![Live loading a PCK file](https://user-images.githubusercontent.com/38859656/102728162-25e4b400-42f8-11eb-9265-a3a93e32aab1.gif)
+![downloading and applying updates](https://user-images.githubusercontent.com/38859656/103387434-c9408080-4ad1-11eb-9249-f7d2d14b8abb.gif) 
 
 Don't you wish that your homebrew Godot game could deliver updates to your players?  During our development cycle we found that we regularly had updates representing only a few MB of changes, but our total PCK file was ~700MB.  We want our users to be able to download only the bytes which have changed!
 
 This project takes an outdated PCK file and a small binary diff as inputs. It outputs the updated PCK file necessary to run the newest version of a game. It can then load the updated PCK.
 
-Everything is hardcoded right now, but we are in the process of making the patch system work for any stream of updates.  We are also adding a publishing process for new releases, and a simple, public webserver which can be queried for metadata about new versions ("deltas" containing the URL of the binary diff as well as checksums for the diff and the expected PCK output).
+The patch system works for any stream of updates, but is presently limited to Mac OSX.  We plan to write a simple script to help publish new releases. There is a public webserver which can be queried for metadata about new versions ("deltas" containing the URL of the binary diff as well as checksums for the diff and the expected PCK output).
 
 [Read the planning ticket](https://github.com/Terkwood/godot-incremental-patch/issues/2).
 
