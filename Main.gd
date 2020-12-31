@@ -45,8 +45,6 @@ func _load_final_pack(pck_file):
 		ResourceLoader.load("res://Main.gd", "", true).take_over_path("res://Main.gd")
 		ResourceLoader.load(_RELEASE_RESOURCE_PATH, "", true).take_over_path(_RELEASE_RESOURCE_PATH)
 		
-		# Try to refresh the scene:  sprites will update
-		#    but the _version() function will not!
 		var refreshed_main_scene = load("res://Main.tscn").instance()
 		root.add_child(refreshed_main_scene)
 	else:
@@ -54,18 +52,19 @@ func _load_final_pack(pck_file):
 
 func _fetch_next_diff():
 	if _diffs_to_fetch.empty():
-		var final_pck_name = _intermediate_pck_path(_fetching)
-		_fetching = null
-		print("All patches applied!")
-		var dd = Directory.new()
-		var ppp = _primary_pck_path()
-		if dd.copy(final_pck_name, ppp) == OK:
-			_clean_up_workdir()
-			_load_final_pack(ppp)
-			return
-		else:
-			printerr("FINAL COPY FAILED!")
-			return
+		if _fetching:
+			var final_pck_name = _intermediate_pck_path(_fetching)
+			_fetching = null
+			print("All patches applied!")
+			var dd = Directory.new()
+			var ppp = _primary_pck_path()
+			if dd.copy(final_pck_name, ppp) == OK:
+				_clean_up_workdir()
+				_load_final_pack(ppp)
+				return
+			else:
+				printerr("FINAL COPY FAILED!")
+				return
 	else:
 		if _fetching:
 			# We just finished fetching, but hold on to the output PCK path
