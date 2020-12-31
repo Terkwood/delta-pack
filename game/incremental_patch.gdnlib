@@ -7,9 +7,9 @@ reloadable=true
 
 [entry]
 
-OSX.64="res://target/x86_64-apple-darwin/debug/libincremental_patch.dylib"
-Windows.64="res://../../target/debug/incremental_patch.dll"
-X11.64="res://target/x86_64-unknown-linux-gnu/debug/libincremental_patch.so"
+OSX.64="res://libincremental_patch.dylib"
+Windows.64="res://incremental_patch.dll"
+X11.64="res://libincremental_patch.so"
 
 [dependencies]
 
