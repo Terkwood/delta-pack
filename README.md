@@ -16,11 +16,16 @@ The patch system works for any stream of updates, but is presently limited to Ma
 
 ## How to use this demo
 
-To make this system work, your Godot app needs to have a ProjectSetting called "application/config/version" configured:
+To make this system work, your Godot app needs to have access to a resource at `res://release.tres` as defined in `release.gd`:
 
-![how to create project setting manually](https://user-images.githubusercontent.com/38859656/103154864-b859dd00-4768-11eb-83f5-ac181c26c32b.png)
+```swift 
+extends Resource
+export var version: String
+```
 
 This will be used to query for new versions of your game from the delta (patch metadata) server.  You must use [Semantic Versioning](https://semver.org) formatting, or the delta server will reject your queries.
+
+Make sure to update this resource every time you release a new version of your software, as it will be used to query for updates. 
 
 ## Community reference
 
