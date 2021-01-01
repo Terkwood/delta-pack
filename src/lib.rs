@@ -14,12 +14,12 @@ use std::{
 
 #[derive(gdnative::NativeClass)]
 #[inherit(Label)]
-struct IncrementalPatch;
+struct DeltaPack;
 
 #[gdnative::methods]
-impl IncrementalPatch {
+impl DeltaPack {
     fn new(_owner: &Label) -> Self {
-        IncrementalPatch
+        DeltaPack
     }
 
     /// Verifies that a file hashes to the expected value
@@ -45,14 +45,13 @@ impl IncrementalPatch {
 
     /// Apply a diff to create a new PCK file. See https://github.com/divvun/bidiff/blob/1e6571e8f36bba3292b33a4b7dfe4ce93a3abd1e/crates/bic/src/main.rs#L257
     #[export]
-    fn apply_diff(
+    fn apply_patch(
         &self,
         _owner: &Label,
         input_pck_path: GodotString,
         diff_bin_path: GodotString,
         output_pck_path: GodotString,
     ) -> bool {
-        godot_print!("output path {}", output_pck_path.to_string());
         if let Err(e) = patch(
             &PathBuf::from_str(&input_pck_path.to_string()).expect("path to input PCK"),
             &PathBuf::from_str(&diff_bin_path.to_string()).expect("path to diff bin"),
@@ -111,7 +110,7 @@ fn compute_checksum<R: Read>(reader: &mut R) -> Result<Vec<u8>> {
 }
 
 fn init(handle: InitHandle) {
-    handle.add_class::<IncrementalPatch>();
+    handle.add_class::<DeltaPack>();
 }
 
 godot_init!(init);

@@ -139,7 +139,7 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 			print("\t%s" % ipp)
 			print("\t%s" % dfp)
 			print("\t%s" % opp)
-			if !patch_status.apply_diff(ipp, dfp, opp):
+			if !patch_status.apply_patch(ipp, dfp, opp):
 				printerr("Could not apply patch")
 				return
 	
