@@ -15,5 +15,5 @@ _global_script_class_icons={
 
 [application]
 
-config/name="Incremental Patch Demo"
+config/name="Delta Pack"
 run/main_scene="res://Main.tscn"
