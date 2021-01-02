@@ -8,4 +8,5 @@ Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.
 
 scoop update
 
-scoop install clang
+scoop install gcc --global
+        
