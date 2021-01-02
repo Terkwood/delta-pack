@@ -166,19 +166,6 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 		$"CenterContainer/VBoxContainer/Patch Status".hide()
 		$CenterContainer/VBoxContainer/TextureRect.hide()
 
-func _mac_pck_path(exec_dir: String):
-	var pf = File.new()
-	var split_exec_dir = exec_dir.split("/")
-	var main_pack = ""
-	for i in range(0, split_exec_dir.size() - 1):
-		main_pack += "/%s" % split_exec_dir[i]
-	main_pack += "/Resources/%s.pck" % ProjectSettings.get("application/config/name")
-	main_pack = main_pack.substr(1)
-	if !pf.file_exists(main_pack):
-		return ERR_FILE_NOT_FOUND
-	else:
-		return main_pack
-
 
 func _primary_pck_path():
 	if OS.has_feature("editor") and _main_pack_env_arg():
@@ -186,22 +173,59 @@ func _primary_pck_path():
 		# this isn't realistic, but it might be useful for testing
 		return _main_pack_env_arg()
 
-	var exec_dir = OS.get_executable_path().get_base_dir()
+	var exec_base_dir = OS.get_executable_path().get_base_dir()
 	match OS.get_name():
 		"OSX":
-			if _is_systemwide_install(exec_dir):
+			if _is_systemwide_install(exec_base_dir):
 				# This is only for dev support.  Standard export flow
 				# does not fall in to this case
 				return _main_pack_env_arg()
-			return _mac_pck_path(exec_dir)
+			return _mac_pck_path(exec_base_dir)
 		"Windows":
-			printerr("TODO")
-			return ERR_HELP
+			return _win_pck_path(exec_base_dir)
 		"X11":
-			printerr("TODO")
-			return ERR_HELP
+			return _linux_pck_path(exec_base_dir)
 		_:
 			return ERR_UNAVAILABLE
+
+# For Godot games exported to Mac OSX:
+# The PCK is nested inside the folder structure of the application,
+# and uses the name of the app as configured in Project Settings.
+func _mac_pck_path(exec_base_dir: String):
+	var pf = File.new()
+	var split_exec_base_dir = exec_base_dir.split("/")
+	var main_pack = ""
+	for i in range(0, split_exec_base_dir.size() - 1):
+		main_pack += "/%s" % split_exec_base_dir[i]
+	main_pack += "/Resources/%s.pck" % ProjectSettings.get("application/config/name")
+	main_pack = main_pack.substr(1)
+	if !pf.file_exists(main_pack):
+		return ERR_FILE_NOT_FOUND
+	else:
+		return main_pack
+
+# For exported Godot games in Windows Desktop:
+# PCK is adjacent to the executable, and shares the same, basic name
+# as the executable.  e.g.   "test.exe" and "test.pck"
+func _win_pck_path(exec_base_dir: String):
+	var exec_split = OS.get_executable_path().split("\\")
+	var exec_file_only = exec_split[exec_split.size() - 1]
+	var exec_no_extension = exec_file_only.split(".")[0]
+	if exec_no_extension == null:
+		return ERR_FILE_UNRECOGNIZED
+	return "%s\\%s.pck" % [ exec_base_dir, exec_no_extension ]
+
+# For exported Godot games in Linux/X11:
+# PCK is adjacent to the executable, and shares the same, basic name
+# as the executable.  e.g.   "test." and "test.pck"
+func _linux_pck_path(exec_base_dir: String):
+	var exec_split = OS.get_executable_path().split("/")
+	var exec_file_only = exec_split[exec_split.size() - 1]
+	var exec_no_extension = exec_file_only.split(".")[0]
+	if exec_no_extension == null:
+		return ERR_FILE_UNRECOGNIZED
+	return "%s/%s.pck" % [ exec_base_dir, exec_no_extension ]
+
 
 ####
 #### DEV SUPPORT FUNCTIONS
@@ -211,9 +235,10 @@ func _primary_pck_path():
 # distributed as part of the export process
 func _main_pack_env_arg():
 	return OS.get_environment("MAIN_PACK")
-# TODO add branches for X11, Windows
-func _is_systemwide_install(exec_dir: String):
-	return exec_dir == _MAC_SYSTEM_INSTALL_DIR and _main_pack_env_arg()
+
+# Caution: This only supports Mac
+func _is_systemwide_install(exec_base_dir: String):
+	return exec_base_dir == _MAC_SYSTEM_INSTALL_DIR and _main_pack_env_arg()
 
 # path to a an intermediate PCK
 func _workdir_path(filename: String):

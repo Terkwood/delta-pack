@@ -1,0 +1,8 @@
+*.b2bsum
+*.diff
+*.pck
+*.exe
+*test*
+*.dll
+*.dylib
+*.so
