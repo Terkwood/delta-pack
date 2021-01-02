@@ -82,27 +82,21 @@ In the context of a game needing to update its PCK file, we use the `bidiff` lib
 
 The creation of the exported payloads becomes more complex than a normal godot app, using this system.  We want to create rust binaries for use in Mac, Windows, and Linux/X11 environments.
 
-### Setting up Cross-Compilation with Mac as Host
-
-You need to run [this script](setup-mac-build.sh) if you want to cross-compile
-from Mac to Linux. The SergioBenitez brew config is important.
+We have github actions configured so that each tagged release pushes shared libs for all three platforms to the releases page.
 
 ### Exported Payload
 
-The exported payload will now contain a library file specific to your client's gaming environment. For example, if you export as a Linux/X11 app, your deliverable has a `.so` library in addition to the `pck` and the executable:
+The payload exported by Godot will must contain a library file specific to your client's gaming environment. For example, if you export as a Linux/X11 app, your deliverable has a `.so` library in addition to the `pck` and the executable:
 
 ```text
 libincremental_patch.so linux-test.pck          linux-test.x86_64
 ```
 
+Still in the planning stage: the shared lib appropriate for a given client OS [must be fetched from the github releases page](https://github.com/Terkwood/delta-pack/issues/5) if it doesn't already exist on the machine performing the export step.
+
 ## Making a new release
 
-This project is configured to publish Mac and Windows versions
-of the rust lib using github actions.
-
-You need to tag a release in order to trigger the publishing
-step.  You can then download the shared lib from the releases
-page in github.
+You need to tag a release in order to trigger the dylib-publishing step.
 
 ```sh
 git tag -a v0.1.0 -m "my release"
