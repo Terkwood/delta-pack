@@ -95,3 +95,16 @@ The exported payload will now contain a library file specific to your client's g
 libincremental_patch.so linux-test.pck          linux-test.x86_64
 ```
 
+## Making a new release
+
+This project is configured to publish Mac and Windows versions
+of the rust lib using github actions.
+
+You need to tag a release in order to trigger the publishing
+step.  You can then download the shared lib from the releases
+page in github.
+
+```sh
+git tag -a v0.1.0 -m "my release"
+git push --tags
+```
