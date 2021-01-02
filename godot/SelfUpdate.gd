@@ -166,27 +166,6 @@ func _on_DeltaBinRequest_request_completed(result, response_code, headers, body)
 		$"CenterContainer/VBoxContainer/Patch Status".hide()
 		$CenterContainer/VBoxContainer/TextureRect.hide()
 
-func _mac_pck_path(exec_dir: String):
-	var pf = File.new()
-	var split_exec_dir = exec_dir.split("/")
-	var main_pack = ""
-	for i in range(0, split_exec_dir.size() - 1):
-		main_pack += "/%s" % split_exec_dir[i]
-	main_pack += "/Resources/%s.pck" % ProjectSettings.get("application/config/name")
-	main_pack = main_pack.substr(1)
-	if !pf.file_exists(main_pack):
-		return ERR_FILE_NOT_FOUND
-	else:
-		return main_pack
-
-func _win_pck_path(exec_dir: String):
-	printerr("TODO")
-	return ERR_HELP
-
-func _linux_pck_path(exec_dir: String):
-	printerr("TODO")
-	return ERR_HELP
-
 
 func _primary_pck_path():
 	if OS.has_feature("editor") and _main_pack_env_arg():
@@ -208,6 +187,29 @@ func _primary_pck_path():
 			return _linux_pck_path(exec_dir)
 		_:
 			return ERR_UNAVAILABLE
+
+
+func _mac_pck_path(exec_dir: String):
+	var pf = File.new()
+	var split_exec_dir = exec_dir.split("/")
+	var main_pack = ""
+	for i in range(0, split_exec_dir.size() - 1):
+		main_pack += "/%s" % split_exec_dir[i]
+	main_pack += "/Resources/%s.pck" % ProjectSettings.get("application/config/name")
+	main_pack = main_pack.substr(1)
+	if !pf.file_exists(main_pack):
+		return ERR_FILE_NOT_FOUND
+	else:
+		return main_pack
+
+func _win_pck_path(exec_dir: String):
+	printerr("TODO")
+	return ERR_HELP
+
+func _linux_pck_path(exec_dir: String):
+	printerr("TODO")
+	return ERR_HELP
+
 
 ####
 #### DEV SUPPORT FUNCTIONS
