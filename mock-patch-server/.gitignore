@@ -1,3 +1,5 @@
+*.pck
+*.exe
 *test*
 *.dll
 *.dylib
