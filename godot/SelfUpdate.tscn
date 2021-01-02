@@ -17,16 +17,16 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
-margin_left = 27.0
+margin_left = 87.0
 margin_top = 25.0
-margin_right = 227.0
+margin_right = 167.0
 margin_bottom = 125.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Version Label" type="Label" parent="CenterContainer/VBoxContainer"]
-margin_right = 200.0
+margin_right = 80.0
 margin_bottom = 14.0
 text = "version here"
 __meta__ = {
@@ -35,7 +35,7 @@ __meta__ = {
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
 margin_top = 18.0
-margin_right = 200.0
+margin_right = 80.0
 margin_bottom = 82.0
 
 [node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer"]
@@ -47,6 +47,7 @@ __meta__ = {
 }
 
 [node name="TextureRect2" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer"]
+visible = false
 margin_left = 68.0
 margin_right = 132.0
 margin_bottom = 64.0
@@ -56,6 +57,7 @@ __meta__ = {
 }
 
 [node name="TextureRect3" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer"]
+visible = false
 margin_left = 136.0
 margin_right = 200.0
 margin_bottom = 64.0
@@ -66,7 +68,7 @@ __meta__ = {
 
 [node name="Patch Status" type="Label" parent="CenterContainer/VBoxContainer"]
 margin_top = 86.0
-margin_right = 200.0
+margin_right = 80.0
 margin_bottom = 100.0
 script = ExtResource( 2 )
 
