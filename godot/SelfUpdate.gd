@@ -203,11 +203,11 @@ func _mac_pck_path(exec_dir: String):
 		return main_pack
 
 func _win_pck_path(exec_dir: String):
-	printerr("TODO")
+	printerr("TODO win: %s" % exec_dir)
 	return ERR_HELP
 
 func _linux_pck_path(exec_dir: String):
-	printerr("TODO")
+	printerr("TODO linux: %s" % exec_dir)
 	return ERR_HELP
 
 
