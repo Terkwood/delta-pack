@@ -1,7 +1,7 @@
 extends Node2D
 
 const _DOWNLOAD_WORKDIR = "user://delta"
-const _DELTA_SERVER = "http://192.186.86.29:45819"
+const _DELTA_SERVER = "http://192.168.86.29:45819"
 const _MAC_SYSTEM_INSTALL_DIR = "/Applications/Godot.app/Contents/MacOS"
 const _USER_FILES_PREFIX = "user://"
 const _RELEASE_RESOURCE_PATH = "res://release.tres"
@@ -24,7 +24,8 @@ func _ready():
 	
 	var metadata_request = get_node_or_null("MetadataRequest")
 	if metadata_request and _version:
-		metadata_request.request("%s/deltas?from_version=%s" % [ _DELTA_SERVER, _version ])
+		var req_url = "%s/deltas?from_version=%s" % [ _DELTA_SERVER, _version ]
+		metadata_request.request(req_url)
 	
 
 func _load_final_pack(pck_file):
