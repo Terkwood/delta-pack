@@ -179,6 +179,14 @@ func _mac_pck_path(exec_dir: String):
 	else:
 		return main_pack
 
+func _win_pck_path(exec_dir: String):
+	printerr("TODO")
+	return ERR_HELP
+
+func _linux_pck_path(exec_dir: String):
+	printerr("TODO")
+	return ERR_HELP
+
 
 func _primary_pck_path():
 	if OS.has_feature("editor") and _main_pack_env_arg():
@@ -195,11 +203,9 @@ func _primary_pck_path():
 				return _main_pack_env_arg()
 			return _mac_pck_path(exec_dir)
 		"Windows":
-			printerr("TODO")
-			return ERR_HELP
+			return _win_pck_path(exec_dir)
 		"X11":
-			printerr("TODO")
-			return ERR_HELP
+			return _linux_pck_path(exec_dir)
 		_:
 			return ERR_UNAVAILABLE
 
@@ -211,7 +217,8 @@ func _primary_pck_path():
 # distributed as part of the export process
 func _main_pack_env_arg():
 	return OS.get_environment("MAIN_PACK")
-# TODO add branches for X11, Windows
+
+# Caution: This only supports Mac
 func _is_systemwide_install(exec_dir: String):
 	return exec_dir == _MAC_SYSTEM_INSTALL_DIR and _main_pack_env_arg()
 
