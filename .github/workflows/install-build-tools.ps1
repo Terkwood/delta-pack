@@ -8,5 +8,5 @@ Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.
 
 scoop update
 
-scoop install gcc --global
+scoop install llvm --global
         

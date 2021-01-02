@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
-      - name: install clang
+      - name: install build tools
         run: .\.github\workflows\install-build-tools.ps1
         shell: powershell
       - name: install toolchain
@@ -42,6 +42,8 @@ jobs:
           default: true
           override: true
       - name: build
+        env:
+          LIBCLANG_PATH: "C:\\ProgramData\\scoop\\apps\\llvm\\current\\bin"
         run: cargo build --release --all-features
       - name: release
         uses: softprops/action-gh-release@v1
