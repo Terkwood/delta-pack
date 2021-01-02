@@ -1,7 +1,7 @@
 extends Node2D
 
 const _DOWNLOAD_WORKDIR = "user://delta"
-const _DELTA_SERVER = "http://127.0.0.1:45819"
+const _DELTA_SERVER = "http://192.168.86.29:45819"
 const _MAC_SYSTEM_INSTALL_DIR = "/Applications/Godot.app/Contents/MacOS"
 const _USER_FILES_PREFIX = "user://"
 const _RELEASE_RESOURCE_PATH = "res://release.tres"
@@ -24,28 +24,26 @@ func _ready():
 	
 	var metadata_request = get_node_or_null("MetadataRequest")
 	if metadata_request and _version:
-		metadata_request.request("%s/deltas?from_version=%s" % [ _DELTA_SERVER, _version ])
+		var req_url = "%s/deltas?from_version=%s" % [ _DELTA_SERVER, _version ]
+		metadata_request.request(req_url)
 	
 
 func _load_final_pack(pck_file):
 	if ProjectSettings.load_resource_pack(pck_file):
 		print("Refreshing main scene.")
 		var root = get_tree().get_root()
-		# Be really sure we remove the current scene,
-		# because we want the next call to _version() to return
-		# the most recent value, even if we haven't restarted
-		# the app!
-		# THANKS https://godotlearn.com/godot-3-1-how-to-destroy-object-node/
+		
+		# Sort of a forceful scouring.
+		# We could potentially just use change_scene here.
 		var main_scene = get_tree().get_current_scene()
 		root.remove_child(main_scene)
 		main_scene.call_deferred("free")
 		
-		# Make sure this script, and the release version resource,
-		# are both refreshed
-		ResourceLoader.load("res://Main.gd", "", true).take_over_path("res://Main.gd")
+		# We must refresh the version resource so that we know
+		# when to stop applying updates.
 		ResourceLoader.load(_RELEASE_RESOURCE_PATH, "", true).take_over_path(_RELEASE_RESOURCE_PATH)
 		
-		var refreshed_main_scene = load("res://Main.tscn").instance()
+		var refreshed_main_scene = load("res://SelfUpdate.tscn").instance()
 		root.add_child(refreshed_main_scene)
 	else:
 		printerr("!!! ... Oh No.  Failed To Load Resource Pack ... !!!")
@@ -86,7 +84,7 @@ func _fetch_next_diff():
 
 func _on_MetadataRequest_request_completed(result, response_code, headers, body):
 	if response_code != HTTPClient.RESPONSE_OK:
-		printerr("Invalid response from delta server")
+		printerr("Invalid response from delta server (%s)" % response_code)
 		return
 	var json = JSON.parse(body.get_string_from_utf8())
 	if typeof(json.result) == TYPE_ARRAY:
