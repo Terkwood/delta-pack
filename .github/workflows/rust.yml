@@ -11,14 +11,6 @@ jobs:
           sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
           sudo apt-get update
           sudo apt-get install -y clang-11 lldb-11 lld-11
-      #- name: write cargo config
-      #  run: |
-      #    mkdir -p ~/.cargo
-      #    cat >~/.cargo/config <<EOL
-      #    [target.x86_64-unknown-linux-gnu]
-      #    linker = "x86_64-unknown-linux-gnu-gcc"
-      #    EOL
-      #  shell: bash
       - name: install toolchain
         uses: actions-rs/toolchain@v1
         with:
