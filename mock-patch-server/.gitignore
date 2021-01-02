@@ -1,3 +1,5 @@
+*.b2bsum
+*.diff
 *.pck
 *.exe
 *test*
