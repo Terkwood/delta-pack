@@ -61,8 +61,13 @@ struct Opts {
     /// Path to the directory for the embedded DB data
     #[structopt(short, long, parse(from_os_str))]
     data_dir: PathBuf,
+    #[structopt(short, long, default_value = "127.0.0.1")]
+    host: String,
+    #[structopt(short, long)]
+    port: Option<u16>,
 }
 
+const DEFAULT_PORT: u16 = 45819;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let opts = Opts::from_args();
@@ -78,8 +83,10 @@ async fn main() -> std::io::Result<()> {
         }
     });
 
+    let bound = format!("{}:{}", opts.host, opts.port.unwrap_or(DEFAULT_PORT));
+    println!("Serving requests on {}", bound);
     HttpServer::new(move || App::new().app_data(db.clone()).service(index))
-        .bind("127.0.0.1:45819")?
+        .bind(bound)?
         .run()
         .await
 }
