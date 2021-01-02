@@ -11,7 +11,7 @@ jobs:
           mkdir -p ~/.cargo
           cat >~/.cargo/config <<EOL
           [target.x86_64-unknown-linux-gnu]
-          linker = "x86_64-linux-gnu-gcc"
+          linker = "x86_64-unknown-linux-gnu-gcc"
           EOL
         shell: bash
       - name: install toolchain
