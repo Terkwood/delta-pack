@@ -6,10 +6,10 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
-      - name: install gcc
+      - name: install libclang-dev
         run: |
           sudo apt update
-          sudo apt-get remove clang
+          sudo apt-get install libclang-dev
         shell: bash
       - name: install toolchain
         uses: actions-rs/toolchain@v1
@@ -32,16 +32,16 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
-      - name: install build tools
+      - name: install llvm
         run: .\.github\workflows\install-build-tools.ps1
         shell: powershell
-      - name: install toolchain
+      - name: install rust toolchain
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           default: true
           override: true
-      - name: build
+      - name: build with clang in env
         env:
           LIBCLANG_PATH: "C:\\ProgramData\\scoop\\apps\\llvm\\current\\bin"
         run: cargo build --release --all-features
