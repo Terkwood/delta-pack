@@ -9,7 +9,7 @@ jobs:
       - name: install gcc
         run: |
           sudo apt update
-          sudo apt install gcc-10 g++-10
+          sudo apt install gcc-10 g++-10 build-essential
         shell: bash
       - name: install toolchain
         uses: actions-rs/toolchain@v1
