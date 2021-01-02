@@ -83,7 +83,7 @@ func _fetch_next_diff():
 
 func _on_MetadataRequest_request_completed(result, response_code, headers, body):
 	if response_code != HTTPClient.RESPONSE_OK:
-		printerr("Invalid response from delta server")
+		printerr("Invalid response from delta server (%s)" % response_code)
 		return
 	var json = JSON.parse(body.get_string_from_utf8())
 	if typeof(json.result) == TYPE_ARRAY:
