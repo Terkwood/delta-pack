@@ -32,8 +32,8 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
-      - name: Install clang
-        run: .\install-clang.ps1
+      - name: install clang
+        run: install-clang.ps1
         shell: powershell
       - name: install toolchain
         uses: actions-rs/toolchain@v1
