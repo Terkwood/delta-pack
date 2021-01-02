@@ -1,7 +1,7 @@
 extends Node2D
 
 const _DOWNLOAD_WORKDIR = "user://delta"
-const _DELTA_SERVER = "http://127.0.0.1:45819"
+const _DELTA_SERVER = "http://192.186.86.29:45819"
 const _MAC_SYSTEM_INSTALL_DIR = "/Applications/Godot.app/Contents/MacOS"
 const _USER_FILES_PREFIX = "user://"
 const _RELEASE_RESOURCE_PATH = "res://release.tres"
