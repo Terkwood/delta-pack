@@ -6,11 +6,10 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
-      - name: install clang and stuff
+      - name: install llvm
         run: |
-          sudo wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo apt-get update
-          sudo apt-get install -y clang-11 lldb-11 lld-11
+          bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+        shell: bash
       - name: install toolchain
         uses: actions-rs/toolchain@v1
         with:
