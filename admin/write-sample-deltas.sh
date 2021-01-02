@@ -2,7 +2,7 @@
 
 DATA_DIR=/tmp/delta-sample-beta
 
-PATCH_SERVER="http://127.0.0.1:8080"
+PATCH_SERVER="http://192.168.86.29:8080"
 
 if [ -d "$DATA_DIR" ]; then
     echo "Cannot proceed if the dir $DATA_DIR exists!"
