@@ -12,6 +12,11 @@ jobs:
           toolchain: stable
           default: true
           override: true
+      - name: install gcc
+        run: |
+          sudo apt update
+          sudo apt install gcc-10 g++-10
+        shell: bash
       - name: build
         run: cargo build --release --all-features
       - name: release
