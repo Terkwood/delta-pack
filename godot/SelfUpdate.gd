@@ -42,7 +42,7 @@ func _load_final_pack(pck_file):
 		# when to stop applying updates.
 		ResourceLoader.load(_RELEASE_RESOURCE_PATH, "", true).take_over_path(_RELEASE_RESOURCE_PATH)
 		
-		var refreshed_main_scene = load("res://Main.tscn").instance()
+		var refreshed_main_scene = load("res://SelfUpdate.tscn").instance()
 		root.add_child(refreshed_main_scene)
 	else:
 		printerr("!!! ... Oh No.  Failed To Load Resource Pack ... !!!")
