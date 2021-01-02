@@ -32,6 +32,9 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
+      - name: install clang
+        run: |
+          scoop install clang
       - name: install toolchain
         uses: actions-rs/toolchain@v1
         with:
