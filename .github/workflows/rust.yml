@@ -6,10 +6,10 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
-      - name: install libclang-dev
+      - name: install libgcc-8-dev
         run: |
           sudo apt update
-          sudo apt-get install libclang-dev
+          sudo apt-get install libgcc-8-dev
         shell: bash
       - name: install toolchain
         uses: actions-rs/toolchain@v1
