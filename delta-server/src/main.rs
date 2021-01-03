@@ -26,8 +26,17 @@ struct AppState {
 }
 
 #[derive(Deserialize)]
-struct DeltaQuery {
+struct QueryDelta {
     from_version: String,
+}
+
+#[derive(Deserialize)]
+struct CreateDelta {
+    pub release_version: String,
+    pub previous_version: String,
+    pub diff_url: String,
+    pub diff_b2bsum: String,
+    pub expected_pck_b2bsum: String,
 }
 
 lazy_static! {
@@ -53,7 +62,7 @@ struct Opts {
 
 const MAX_POST_SIZE: usize = 262_144; // max payload size is 256k
 #[post("/deltas")]
-async fn create(mut payload: web::Payload, _data: web::Data<AppState>) -> Result<HttpResponse> {
+async fn create(mut payload: web::Payload, state: web::Data<AppState>) -> Result<HttpResponse> {
     // payload is a stream of Bytes objects
     let mut body = web::BytesMut::new();
     while let Some(chunk) = payload.next().await {
@@ -65,20 +74,37 @@ async fn create(mut payload: web::Payload, _data: web::Data<AppState>) -> Result
         body.extend_from_slice(&chunk);
     }
 
-    let _delta = serde_json::from_slice::<Delta>(&body)?;
+    let create_delta = serde_json::from_slice::<CreateDelta>(&body)?;
 
-    todo!("write to DB");
-    Ok(HttpResponse::Created().json(_delta))
+    let db = state.delta_db.lock().expect("lock");
+
+    let id = db.generate_id().expect("sled gen ID");
+    let delta_key = id.to_be_bytes();
+
+    let delta_value = Delta::from((id, create_delta));
+    println!("Writing delta: {:#?}", delta_value);
+
+    db.insert(
+        delta_key,
+        &IVec::from(bincode::serialize(&delta_value).expect("serialize")),
+    )
+    .expect("sled insert");
+
+    let version_id_tree: sled::Tree = db.open_tree(b"version->id lookup").expect("sled open VIT");
+    version_id_tree
+        .insert(&delta_value.release_version, &id.to_be_bytes())
+        .expect("sled vit insert");
+    Ok(HttpResponse::Created().json(delta_value))
 }
 
 #[get("/deltas")]
 async fn query(
-    data: web::Data<AppState>,
-    delta_query: web::Query<DeltaQuery>,
+    state: web::Data<AppState>,
+    delta_query: web::Query<QueryDelta>,
 ) -> Result<HttpResponse> {
     if RE_SEMVER.is_match(&delta_query.from_version) {
-        let db = &data.delta_db.lock().expect("db lock");
-        let version_id_lookup = &data.version_id_tree.lock().expect("vit lock");
+        let db = &state.delta_db.lock().expect("db lock");
+        let version_id_lookup = &state.version_id_tree.lock().expect("vit lock");
 
         match version_id_lookup.get(&delta_query.from_version) {
             Ok(Some(id_bytes)) => Ok(HttpResponse::Ok().json(deltas_from(db, id_bytes)?)),
@@ -159,4 +185,28 @@ fn deltas_from(db: &sled::Db, id: IVec) -> Result<Vec<Delta>> {
     }
 
     Ok(out)
+}
+
+impl From<(u64, CreateDelta)> for Delta {
+    fn from(
+        (
+            id,
+            CreateDelta {
+                release_version,
+                previous_version,
+                diff_b2bsum,
+                diff_url,
+                expected_pck_b2bsum,
+            },
+        ): (u64, CreateDelta),
+    ) -> Self {
+        Self {
+            id,
+            expected_pck_b2bsum,
+            previous_version,
+            release_version,
+            diff_b2bsum,
+            diff_url,
+        }
+    }
 }
