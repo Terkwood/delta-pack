@@ -30,9 +30,6 @@ struct DeltaQuery {
     from_version: String,
 }
 
-#[derive(Deserialize)]
-struct DeltaCreate {}
-
 lazy_static! {
     /// See https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
     static ref RE_SEMVER: Regex = Regex::new(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$").unwrap();
@@ -67,7 +64,11 @@ async fn create(mut payload: web::Payload, _data: web::Data<AppState>) -> Result
         }
         body.extend_from_slice(&chunk);
     }
-    todo!()
+
+    let _delta = serde_json::from_slice::<Delta>(&body)?;
+
+    todo!("write to DB");
+    Ok(HttpResponse::Created().json(_delta))
 }
 
 #[get("/deltas")]
