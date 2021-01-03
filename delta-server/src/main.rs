@@ -67,8 +67,8 @@ struct Opts {
     /// Path to the directory for the embedded DB data
     #[structopt(short, long, parse(from_os_str))]
     data_dir: PathBuf,
-    #[structopt(short, long, default_value = "127.0.0.1")]
-    host: String,
+    #[structopt(short, long)]
+    host: Option<String>,
     #[structopt(short, long)]
     port: Option<u16>,
     #[structopt(short, long)]
@@ -77,6 +77,7 @@ struct Opts {
 
 const DEFAULT_PORT: u16 = 45819;
 const DEFAULT_ADMIN_PORT: u16 = 37917;
+const DEFAULT_HOST: &str = "127.0.0.1";
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let opts = Opts::from_args();
@@ -99,11 +100,13 @@ async fn main() -> std::io::Result<()> {
         version_id_tree: version_ids,
     });
 
-    let public_bind = format!("{}:{}", opts.host, opts.port.unwrap_or(DEFAULT_PORT));
+    let the_host: &str = &&opts.host.unwrap_or(DEFAULT_HOST.to_string());
+
+    let public_bind = format!("{}:{}", the_host, opts.port.unwrap_or(DEFAULT_PORT));
 
     let admin_bind = format!(
         "{}:{}",
-        opts.host,
+        the_host,
         opts.admin_port.unwrap_or(DEFAULT_ADMIN_PORT)
     );
 
