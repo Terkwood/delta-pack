@@ -4,7 +4,7 @@ extern crate serde_derive;
 extern crate lazy_static;
 
 use actix_web::{error, get, post, web, App, HttpResponse, HttpServer, Result};
-use futures::future;
+use futures::{future, StreamExt};
 use regex::Regex;
 use sled::{Db, IVec, Tree};
 use std::path::PathBuf;
@@ -30,33 +30,12 @@ struct DeltaQuery {
     from_version: String,
 }
 
+#[derive(Deserialize)]
+struct DeltaCreate {}
+
 lazy_static! {
     /// See https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
     static ref RE_SEMVER: Regex = Regex::new(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$").unwrap();
-}
-
-#[post("/deltas")]
-async fn create(_data: web::Data<AppState>) -> Result<HttpResponse> {
-    todo!()
-}
-
-#[get("/deltas")]
-async fn fetch(
-    data: web::Data<AppState>,
-    delta_query: web::Query<DeltaQuery>,
-) -> Result<HttpResponse> {
-    if RE_SEMVER.is_match(&delta_query.from_version) {
-        let db = &data.delta_db.lock().expect("db lock");
-        let version_id_lookup = &data.version_id_tree.lock().expect("vit lock");
-
-        match version_id_lookup.get(&delta_query.from_version) {
-            Ok(Some(id_bytes)) => Ok(HttpResponse::Ok().json(deltas_from(db, id_bytes)?)),
-            Ok(None) => Ok(HttpResponse::NotFound().finish()),
-            Err(_) => Ok(HttpResponse::InternalServerError().finish()),
-        }
-    } else {
-        Ok(HttpResponse::BadRequest().finish())
-    }
 }
 
 /// Starts a web server which can satisfy delta
@@ -73,6 +52,41 @@ struct Opts {
     port: Option<u16>,
     #[structopt(short, long)]
     admin_port: Option<u16>,
+}
+
+const MAX_POST_SIZE: usize = 262_144; // max payload size is 256k
+#[post("/deltas")]
+async fn create(mut payload: web::Payload, _data: web::Data<AppState>) -> Result<HttpResponse> {
+    // payload is a stream of Bytes objects
+    let mut body = web::BytesMut::new();
+    while let Some(chunk) = payload.next().await {
+        let chunk = chunk?;
+        // limit max size of in-memory payload
+        if (body.len() + chunk.len()) > MAX_POST_SIZE {
+            return Err(error::ErrorBadRequest("overflow"));
+        }
+        body.extend_from_slice(&chunk);
+    }
+    todo!()
+}
+
+#[get("/deltas")]
+async fn query(
+    data: web::Data<AppState>,
+    delta_query: web::Query<DeltaQuery>,
+) -> Result<HttpResponse> {
+    if RE_SEMVER.is_match(&delta_query.from_version) {
+        let db = &data.delta_db.lock().expect("db lock");
+        let version_id_lookup = &data.version_id_tree.lock().expect("vit lock");
+
+        match version_id_lookup.get(&delta_query.from_version) {
+            Ok(Some(id_bytes)) => Ok(HttpResponse::Ok().json(deltas_from(db, id_bytes)?)),
+            Ok(None) => Ok(HttpResponse::NotFound().finish()),
+            Err(_) => Ok(HttpResponse::InternalServerError().finish()),
+        }
+    } else {
+        Ok(HttpResponse::BadRequest().finish())
+    }
 }
 
 const DEFAULT_PORT: u16 = 45819;
@@ -115,7 +129,7 @@ async fn main() -> std::io::Result<()> {
         public_bind, admin_bind
     );
 
-    let public = HttpServer::new(move || App::new().app_data(app_state.clone()).service(fetch))
+    let public = HttpServer::new(move || App::new().app_data(app_state.clone()).service(query))
         .bind(public_bind)?
         .run();
 
