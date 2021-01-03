@@ -40,6 +40,8 @@ struct CreateDelta {
 }
 
 lazy_static! {
+    static ref RE_HEX: Regex = Regex::new(r"^[0-9a-fA-F]+$").unwrap();
+
     /// See https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
     static ref RE_SEMVER: Regex = Regex::new(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$").unwrap();
 }
@@ -76,10 +78,20 @@ async fn create(mut payload: web::Payload, state: web::Data<AppState>) -> Result
 
     let create_delta = serde_json::from_slice::<CreateDelta>(&body)?;
 
+    if !RE_HEX.is_match(&create_delta.diff_b2bsum)
+        || !RE_HEX.is_match(&create_delta.expected_pck_b2bsum)
+    {
+        return bad_req();
+    }
+
     if !RE_SEMVER.is_match(&create_delta.previous_version)
         || !RE_SEMVER.is_match(&create_delta.release_version)
     {
-        return Ok(HttpResponse::BadRequest().finish());
+        return bad_req();
+    }
+
+    if let Err(_) = url::Url::parse(&create_delta.diff_url) {
+        return bad_req();
     }
 
     let db = state.delta_db.lock().expect("admin db lock");
@@ -119,6 +131,10 @@ async fn query(
     } else {
         Ok(HttpResponse::BadRequest().finish())
     }
+}
+
+fn bad_req() -> Result<HttpResponse> {
+    Ok(HttpResponse::BadRequest().finish())
 }
 
 const DEFAULT_PORT: u16 = 45819;
