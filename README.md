@@ -16,6 +16,14 @@ We plan to write a simple script to help publish new releases (issue #5). There 
 
 First of all, this is a demo. Until we have more time to test it out with a few small game deployments, we can't offer much in the way of support. That said, the strategy seems promising as a stopgap until Godot engine provides an official alternative. 
 
+You must:
+
+- manage the version of your Godot game carefully
+- host [delta server](./delta-server), which describes version diffs 
+- host the diffs on something like S3, a CDN, or your own webserver
+
+### Godot app
+
 To make this system work, your Godot app needs to have access to a resource at `res://release.tres` as defined in `release.gd`:
 
 ```swift 
@@ -26,6 +34,14 @@ export var version: String
 This will be used to query for new versions of your game from the delta (patch metadata) server.  You must use [Semantic Versioning](https://semver.org) formatting, or the delta server will reject your queries.
 
 Make sure to update this resource every time you release a new version of your software, as it will be used to query for updates. 
+
+### delta server 
+
+Todo
+
+### diffs
+
+Todo 
 
 ## Community reference
 
