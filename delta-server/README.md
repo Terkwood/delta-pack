@@ -50,7 +50,9 @@ $ curl http://127.0.0.1:45819/deltas\?from_version=\0.0.0  | jq
 
 ## Admin route
 
-There's an admin route exposed on an alternate port. Using this, you can write new records. Configure your firewall resources: you want to make sure that the admin route is not available via public-facing internet.
+There's an admin route exposed on an alternate port. Using this, you can record the necessary metadata about your release.
+
+Configure your firewall resources: you want to _make sure that the admin route is not available via public-facing internet_.
 
 ```sh
 # always start with a fake 0.0.0 version
