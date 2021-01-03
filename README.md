@@ -1,6 +1,4 @@
-# 🚧 delta pack: incremental updates for Godot games 🚧
-
-🏗 _THIS PROJECT IS STILL UNDER CONSTRUCTION!_ 🏗
+# delta pack: incremental updates for Godot games
 
 ![downloading and applying updates](https://user-images.githubusercontent.com/38859656/103387434-c9408080-4ad1-11eb-9249-f7d2d14b8abb.gif) 
 
@@ -15,6 +13,8 @@ The patch system works for any stream of updates, but is presently limited to Ma
 [See the official docs](https://godot-es-docs.readthedocs.io/en/latest/getting_started/workflow/export/exporting_pcks.html) for more information on Godot Engine's support for live-reloading of PCK (game payload) files.
 
 ## How to use this demo
+
+First of all, this is a demo. Until we have more time to test it out with a few small game deployments, we can't offer much in the way of support. That said, the strategy seems promising as a stopgap until Godot engine provides an official alternative. 
 
 To make this system work, your Godot app needs to have access to a resource at `res://release.tres` as defined in `release.gd`:
 
