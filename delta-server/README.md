@@ -47,3 +47,28 @@ $ curl http://127.0.0.1:45819/deltas\?from_version=\0.0.0  | jq
   }
 ]
 ```
+
+## Admin route
+
+There's an admin route exposed on an alternate port. Using this, you can record the necessary metadata about your release.
+
+Configure your firewall resources: you want to _make sure that the admin route is not available via public-facing internet_.
+
+```sh
+# always start with a fake 0.0.0 version
+curl --header "Content-Type: application/json" \
+   --request POST \
+   --data '{"release_version": "0.0.0", "previous_version": "0.0.0", "diff_url": "http://localhost:59999/nothing", "diff_b2bsum": "0", "expected_pck_b2bsum": "0"}' \
+ http://127.0.0.1:37917/deltas
+
+curl --header "Content-Type: application/json" \
+   --request POST \
+   --data '{"release_version": "0.1.0", "previous_version": "0.0.0", "diff_url": "http://localhost:59999/sample1.diff", "diff_b2bsum": "abcd", "expected_pck_b2bsum": "def0"}' \
+ http://127.0.0.1:37917/deltas
+
+
+curl --header "Content-Type: application/json" \
+   --request POST \
+   --data '{"release_version": "0.2.0", "previous_version": "0.1.0", "diff_url": "http://localhost:59999/sample2.diff", "diff_b2bsum": "1234", "expected_pck_b2bsum": "5678"}' \
+ http://127.0.0.1:37917/deltas
+```
