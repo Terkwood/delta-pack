@@ -3,11 +3,12 @@ extern crate serde_derive;
 #[macro_use]
 extern crate lazy_static;
 
-use actix_web::{error, get, web, App, HttpResponse, HttpServer, Result};
+use actix_web::{error, get, post, web, App, HttpResponse, HttpServer, Result};
+use futures::future;
 use regex::Regex;
 use sled::{Db, IVec, Tree};
 use std::path::PathBuf;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 use structopt::StructOpt;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -20,8 +21,8 @@ pub struct Delta {
     pub expected_pck_b2bsum: String,
 }
 struct AppState {
-    delta_db: Mutex<Db>,
-    version_id_tree: Mutex<Tree>,
+    delta_db: Arc<Mutex<Db>>,
+    version_id_tree: Arc<Mutex<Tree>>,
 }
 
 #[derive(Deserialize)]
@@ -34,8 +35,13 @@ lazy_static! {
     static ref RE_SEMVER: Regex = Regex::new(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$").unwrap();
 }
 
+#[post("/deltas")]
+async fn create(_data: web::Data<AppState>) -> Result<HttpResponse> {
+    todo!()
+}
+
 #[get("/deltas")]
-async fn index(
+async fn fetch(
     data: web::Data<AppState>,
     delta_query: web::Query<DeltaQuery>,
 ) -> Result<HttpResponse> {
@@ -65,30 +71,65 @@ struct Opts {
     host: String,
     #[structopt(short, long)]
     port: Option<u16>,
+    #[structopt(short, long)]
+    admin_port: Option<u16>,
 }
 
 const DEFAULT_PORT: u16 = 45819;
+const DEFAULT_ADMIN_PORT: u16 = 37917;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let opts = Opts::from_args();
 
-    let db = web::Data::new({
-        let db = sled::open(&opts.data_dir).expect("open db");
-        let vit = db.open_tree(b"version->id lookup").expect("open tree");
+    let db = Arc::new(Mutex::new(sled::open(&opts.data_dir).expect("open db")));
+    let vit = db
+        .lock()
+        .expect("init vit")
+        .open_tree(b"version->id lookup")
+        .expect("open tree");
 
-        AppState {
-            // this directory will be created if it does not exist
-            delta_db: Mutex::new(db),
-            version_id_tree: Mutex::new(vit),
-        }
+    let version_ids = Arc::new(Mutex::new(vit));
+
+    let db2 = db.clone();
+    let v2 = version_ids.clone();
+
+    let app_state = web::Data::new(AppState {
+        // this directory will be created if it does not exist
+        delta_db: db,
+        version_id_tree: version_ids,
     });
 
-    let bound = format!("{}:{}", opts.host, opts.port.unwrap_or(DEFAULT_PORT));
-    println!("Serving requests on {}", bound);
-    HttpServer::new(move || App::new().app_data(db.clone()).service(index))
-        .bind(bound)?
-        .run()
-        .await
+    let public_bind = format!("{}:{}", opts.host, opts.port.unwrap_or(DEFAULT_PORT));
+
+    let admin_bind = format!(
+        "{}:{}",
+        opts.host,
+        opts.admin_port.unwrap_or(DEFAULT_ADMIN_PORT)
+    );
+
+    println!(
+        "Serving requests on {} (public) and {} (admin)",
+        public_bind, admin_bind
+    );
+
+    let public = HttpServer::new(move || App::new().app_data(app_state.clone()).service(fetch))
+        .bind(public_bind)?
+        .run();
+
+    let admin = HttpServer::new(move || {
+        App::new()
+            .app_data(AppState {
+                delta_db: db2.clone(),
+                version_id_tree: v2.clone(),
+            })
+            .service(create)
+    })
+    .bind(admin_bind)?
+    .run();
+
+    future::try_join(public, admin).await?;
+
+    Ok(())
 }
 
 fn deltas_from(db: &sled::Db, id: IVec) -> Result<Vec<Delta>> {
