@@ -109,12 +109,3 @@ libincremental_patch.so linux-test.pck          linux-test.x86_64
 ```
 
 Still in the planning stage: the shared lib appropriate for a given client OS [must be fetched from the github releases page](https://github.com/Terkwood/delta-pack/issues/5) if it doesn't already exist on the machine performing the export step.
-
-## Making a new release
-
-You need to tag a release in order to trigger the dylib-publishing step.
-
-```sh
-git tag -a v0.1.0 -m "my release"
-git push --tags
-```
