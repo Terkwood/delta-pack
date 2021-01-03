@@ -1,3 +1,10 @@
+# Making a new release
+#
+# You need to tag a release in order to trigger the dylib-publishing step.
+# ```sh
+# git tag -a v0.1.0 -m "my release"
+# git push --tags
+# ```
 name: Build dylib
 on: [push]
 jobs:
