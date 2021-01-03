@@ -6,9 +6,9 @@ Don't you wish that your homebrew Godot game could deliver updates to your playe
 
 This project takes an outdated PCK file and a small binary diff as inputs. It outputs the updated PCK file necessary to run the newest version of a game. It can then load the updated PCK.
 
-The patch system works for any stream of updates, but is presently limited to Mac OSX.  We plan to write a simple script to help publish new releases. There is a public webserver which can be queried for metadata about new versions ("deltas" containing the URL of the binary diff as well as checksums for the diff and the expected PCK output).
+The patch system works for any stream of updates. It only works for Mac, Windows and Linux/X11.
 
-[Read the planning ticket](https://github.com/Terkwood/godot-incremental-patch/issues/2).
+We plan to write a simple script to help publish new releases (issue #5). There is a public webserver which can be queried for metadata about new versions ("deltas" containing the URL of the binary diff as well as checksums for the diff and the expected PCK output).
 
 [See the official docs](https://godot-es-docs.readthedocs.io/en/latest/getting_started/workflow/export/exporting_pcks.html) for more information on Godot Engine's support for live-reloading of PCK (game payload) files.
 
