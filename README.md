@@ -43,9 +43,6 @@ Make sure to update this resource every time you release a new version of your s
 
 The diffs referenced by delta-server need to be hosted in something like cloud storage, a CDN, or your favorite webserver.
 
-## Community reference
-
-[This question has been explored a bit on the Godot User Forums](https://godotengine.org/qa/23165/can-we-hot-update-gdscript). Once the project is more mature, we should post there and assess community interest in the project.
 
 ## Using bidiff
 
