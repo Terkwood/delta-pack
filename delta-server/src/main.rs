@@ -11,7 +11,7 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use structopt::StructOpt;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 pub struct Delta {
     pub id: u64,
     pub release_version: String,
@@ -76,13 +76,12 @@ async fn create(mut payload: web::Payload, state: web::Data<AppState>) -> Result
 
     let create_delta = serde_json::from_slice::<CreateDelta>(&body)?;
 
-    let db = state.delta_db.lock().expect("lock");
+    let db = state.delta_db.lock().expect("admin db lock");
 
     let id = db.generate_id().expect("sled gen ID");
     let delta_key = id.to_be_bytes();
 
     let delta_value = Delta::from((id, create_delta));
-    println!("Writing delta: {:#?}", delta_value);
 
     db.insert(
         delta_key,
@@ -160,16 +159,15 @@ async fn main() -> std::io::Result<()> {
         .bind(public_bind)?
         .run();
 
-    let admin = HttpServer::new(move || {
-        App::new()
-            .app_data(AppState {
-                delta_db: db2.clone(),
-                version_id_tree: v2.clone(),
-            })
-            .service(create)
-    })
-    .bind(admin_bind)?
-    .run();
+    let app_state = web::Data::new(AppState {
+        // this directory will be created if it does not exist
+        delta_db: db2,
+        version_id_tree: v2,
+    });
+
+    let admin = HttpServer::new(move || App::new().app_data(app_state.clone()).service(create))
+        .bind(admin_bind)?
+        .run();
 
     future::try_join(public, admin).await?;
 

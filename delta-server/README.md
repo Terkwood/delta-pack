@@ -47,3 +47,14 @@ $ curl http://127.0.0.1:45819/deltas\?from_version=\0.0.0  | jq
   }
 ]
 ```
+
+## Admin route
+
+There's an admin route exposed on an alternate port. Using this, you can write new records. Configure your firewall resources: you want to make sure that the admin route is not available via public-facing internet.
+
+```sh
+curl --header "Content-Type: application/json" \
+   --request POST \
+   --data '{"release_version": "0.2.0", "previous_version": "0.1.0", "diff_url": "http://localhost:59999/bar/baz.diff", "diff_b2bsum": "0", "expected_pck_b2bsum": "abc"}' \
+ http://127.0.0.1:37917
+```
