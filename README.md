@@ -4,7 +4,7 @@
 
 Don't you wish that your homebrew Godot game could deliver updates to your players?  During our development cycle we found that we regularly had updates representing only a few MB of changes, but our total PCK file was ~700MB.  We want our users to be able to download only the bytes which have changed!
 
-This project takes an outdated PCK file and a small binary diff as inputs. It outputs the updated PCK file necessary to run the newest version of a game. It can then load the updated PCK.
+This project takes an outdated PCK file and a small binary diff as inputs. It creates the updated PCK file necessary to run the newest version of a game. It can then load the updated PCK.
 
 The patch system works for any stream of updates. It only works for Mac, Windows and Linux/X11.
 
