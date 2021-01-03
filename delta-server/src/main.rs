@@ -76,6 +76,12 @@ async fn create(mut payload: web::Payload, state: web::Data<AppState>) -> Result
 
     let create_delta = serde_json::from_slice::<CreateDelta>(&body)?;
 
+    if !RE_SEMVER.is_match(&create_delta.previous_version)
+        || !RE_SEMVER.is_match(&create_delta.release_version)
+    {
+        return Ok(HttpResponse::BadRequest().finish());
+    }
+
     let db = state.delta_db.lock().expect("admin db lock");
 
     let id = db.generate_id().expect("sled gen ID");
