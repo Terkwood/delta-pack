@@ -1,3 +1,7 @@
+# next: v0.2.1
+
+- Use `nproc` to determine threads in create-diff.sh 
+
 # v0.2.0
 
 - Add admin http route to create record (#46)
