@@ -1,6 +1,6 @@
 # next: v0.2.1
 
-- Use `nproc` to determine threads in create-diff.sh 
+- Use `nproc` to determine threads in create-diff.sh  (#55)
 
 # v0.2.0
 
